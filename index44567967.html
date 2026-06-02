@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعداد الفرق واللاعبين</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Inter:wght@400;600;700&display=swap" media="print" onload="this.media='all'">
+    <style>
+        :root {
+          --primary-color: #028C46;
+          --primary-hover: #024F25;
+          --bg-dark: #0d1520;
+          --card-bg: #111d24;
+          --text-white: #ffffff;
+          --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          font-family: 'Inter', 'Cairo', sans-serif;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(ellipse at 50% -5%, rgba(2,140,70,0.12) 0%, transparent 52%),
+                repeating-linear-gradient(45deg, transparent, transparent 7px, rgba(2,140,70,0.025) 7px, rgba(2,140,70,0.025) 8px),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Ccircle cx='20' cy='20' r='3' fill='none' stroke='rgba(2,140,70,0.04)' stroke-width='1'/%3E%3Ccircle cx='70' cy='50' r='3' fill='none' stroke='rgba(2,140,70,0.04)' stroke-width='1'/%3E%3Ccircle cx='100' cy='90' r='3' fill='none' stroke='rgba(2,140,70,0.04)' stroke-width='1'/%3E%3C/svg%3E"),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30,4 L56,30 L30,56 L4,30 Z' fill='none' stroke='rgba(2,140,70,0.06)' stroke-width='1.2'/%3E%3Cpath d='M30,17 L43,30 L30,43 L17,30 Z' fill='none' stroke='rgba(2,140,70,0.04)' stroke-width='1'/%3E%3C/svg%3E");
+            background-size: auto, 8px 8px, 120px 120px, 60px 60px;
+            color: white;
+            font-family: 'Inter', 'Cairo', sans-serif;
+            padding: 20px;
+            margin: 0;
+            text-align: center;
+            direction: rtl;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #028C46, transparent);
+            z-index: 9999;
+            pointer-events: none;
+        }
+        
+        .nav-header {
+            display: inline-flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0 auto 16px;
+            padding: 8px 20px;
+            gap: 24px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid rgba(2,140,70,0.25);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 999;
+            display: inline-block;
+            width: fit-content;
+            background: rgba(13,21,32,0.9);
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(2,140,70,0.35);
+            backdrop-filter: blur(4px);
+            font-size: 0.9em;
+            transition: 0.3s;
+        }
+        .back-btn:hover { filter: brightness(1.1); transform: scale(1.05); box-shadow: 0 4px 12px rgba(2,140,70,0.35); }
+
+        h1 { color: var(--primary-color); margin: 0; font-size: clamp(0.95em, 2.5vw, 1.3em); text-shadow: 0 4px 10px rgba(2, 79, 37, 0.4); }
+        
+        .container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: nowrap; 
+            gap: 28px;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        
+        .team-card {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 38px 40px;
+            flex: 1;
+            min-width: 420px;
+            border: 1px solid rgba(2,140,70,0.25);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 1px 0 rgba(2,140,70,0.15);
+            transition: var(--transition);
+        }
+        .team-card:hover {
+            border-color: #028C46;
+            box-shadow: 0 8px 25px rgba(2,140,70,0.35), inset 0 1px 0 rgba(2,140,70,0.15);
+        }
+        
+        .team-card h2 { color: var(--primary-color); border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+        
+        .input-group { margin-bottom: 15px; text-align: right; }
+        .input-group label { display: block; margin-bottom: 5px; color: var(--primary-color); font-weight: bold; font-size: 0.9em; }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(2,140,70,0.25);
+            background-color: #1a2830;
+            color: white;
+            font-size: 1em;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Cairo', sans-serif;
+            transition: border-color 0.3s;
+        }
+        .input-group input:focus { outline: none; border-color: #028C46; }
+
+        .players-section {
+            background: #162C36;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border: 1px solid rgba(2,140,70,0.2);
+        }
+        
+        .logo-preview-box {
+            margin: 15px 0;
+            background-color: #1a2830;
+            border-radius: 15px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed rgba(2,140,70,0.3);
+        }
+        
+        .logo-preview-box img { max-width: 80%; max-height: 80%; object-fit: contain; }
+        
+        .main-buttons { margin-top: 40px; }
+        .save-btn {
+            background: linear-gradient(135deg, #028C46, #024F25);
+            color: white;
+            padding: 15px 80px;
+            font-size: 1.3em;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(2,140,70,0.3);
+        }
+        .save-btn:hover { filter: brightness(1.1); transform: scale(1.02); box-shadow: 0 8px 25px rgba(2,140,70,0.35); }
+
+        #status-toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            padding: 15px 30px; border-radius: 10px; font-weight: bold; display: none; z-index: 1000;
+        }
+
+        .container {
+            position: relative;
+        }
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 380px;
+            height: 380px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50,2 L98,50 L50,98 L2,50 Z' fill='%23028C46'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
+        }
+        label[for="right-logo-file"],
+        label[for="left-logo-file"] {
+            background: linear-gradient(135deg, #028C46, #024F25) !important;
+            color: white !important;
+        }
+        a[download] {
+            background: #162C36 !important;
+            color: #028C46 !important;
+            border: 1px solid #028C46 !important;
+        }
+        a[download]:hover {
+            background: #028C46 !important;
+            color: #ffffff !important;
+        }
+
+        @media (max-width: 800px) {
+            .container { flex-wrap: wrap; }
+            .team-card { width: 100%; min-width: unset; }
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .nav-header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+                padding: 12px;
+            }
+            .nav-header > div { width: auto; }
+            .team-card { padding: 16px; }
+            .team-card h2 { font-size: 1.1em; }
+            .input-group input { font-size: 0.95em; }
+            .logo-preview-box { height: 90px; }
+            .save-btn { padding: 12px 30px; font-size: 1.1em; width: 100%; }
+            .main-buttons { margin-top: 24px; }
+        }
+
+ 
+
+        @keyframes topBarShimmer {
+            0%   { opacity: 0; filter: brightness(1); }
+            50%  { opacity: 1; filter: brightness(1.8); }
+            100% { opacity: 1; filter: brightness(1); }
+        }
+        body::before { animation: topBarShimmer 1.5s ease-out 1 forwards; }
+
+        @keyframes cardEntrance {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes logoFadeIn {
+            from { opacity: 0; transform: scale(0.92); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+        .logo-preview-box img { animation: logoFadeIn 0.4s ease-out both; }
+
+        @keyframes saveBtnShimmer {
+            0%   { background-position: 200% center; }
+            100% { background-position: -200% center; }
+        }
+        .save-btn {
+            background: linear-gradient(135deg, #028C46 0%, #03c065 40%, #028C46 60%, #024F25 100%);
+            background-size: 200% auto;
+            animation: saveBtnShimmer 3s linear infinite;
+        }
+
+        .team-card:hover { transform: translateY(-4px); }
+        button:active { transform: scale(0.96); }
+        .input-group input:focus { box-shadow: 0 0 0 3px rgba(2,140,70,0.25); }
+
+        @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
+
+        /* Compact layout — fit all content in one viewport height */
+        body { padding: 12px; }
+        .nav-header { margin: 0 auto 10px; padding: 7px 18px; }
+        h1 { font-size: clamp(0.85em, 2vw, 1.15em); }
+        .container { gap: 18px; }
+        .team-card { padding: 18px 22px; border-radius: 16px; }
+        .team-card h2 { padding-bottom: 8px; margin-bottom: 12px; font-size: 1.05em; }
+        .input-group { margin-bottom: 9px; }
+        .input-group label { margin-bottom: 4px; font-size: 0.85em; }
+        .input-group input { padding: 8px 10px; font-size: 0.92em; }
+        .players-section { padding: 12px; margin: 8px 0; border-radius: 9px; }
+        .logo-preview-box { height: 82px; margin: 8px 0; border-radius: 11px; }
+        .main-buttons { margin-top: 14px; }
+        .save-btn { padding: 11px 70px; font-size: 1.15em; }
+        label[for="right-logo-file"],
+        label[for="left-logo-file"],
+        label[for="right-p1img-file"],
+        label[for="left-p1img-file"] { padding: 7px 15px !important; font-size: 0.85em !important; }
+    </style>
+</head>
+<body>
+    <div style="position:fixed;top:0;left:0;right:0;z-index:100;height:4px;background:linear-gradient(90deg,#162B32 0%,#1E9847 40%,#25c45a 60%,#162B32 100%);"></div>
+
+    <div id="status-toast"></div>
+
+    <a href="index.html" class="back-btn">← العودة للقائمة الرئسية</a>
+
+    <div class="nav-header">
+        <h1 id="active-match-title">إعداد البيانات</h1>
+    </div>
+    
+    <div class="container">
+        <div class="team-card">
+            <h2>الفريق الايمن A-B-C</h2>
+            <div class="input-group">
+                <label>اسم النادي/الدولة:</label>
+                <input type="text" id="right-team-name" placeholder="  ">
+            </div>
+            
+            <div class="players-section">
+                <div class="input-group">
+                    <label>اللاعب الأول:</label>
+                    <input type="text" id="right-p1" placeholder="اسم اللاعب الأساسي">
+                </div>
+                <div class="input-group">
+                    <label>صورة اللاعب (اختياري):</label>
+                    <input type="text" id="right-p1img" placeholder="رابط URL للصورة" oninput="onPlayerImgUrlInput('right')">
+                </div>
+                <div class="input-group">
+                    <label>أو رفع الصورة من الجهاز:</label>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <label for="right-p1img-file" style="background:linear-gradient(135deg,#028C46,#024F25); color:white; padding:9px 18px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:0.9em; white-space:nowrap; margin:0;">📁 اختر ملف</label>
+                        <input type="file" id="right-p1img-file" accept="image/*" style="display:none;" onchange="onPlayerImgFileUpload('right')">
+                        <span id="right-p1img-name" style="color:#888; font-size:0.85em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">لم يتم اختيار ملف</span>
+                    </div>
+                </div>
+                <div class="logo-preview-box" id="right-p1img-preview" style="height:100px;">
+                    <span style="color:#444;">معاينة صورة اللاعب</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>رابط الشعار (أونلاين):</label>
+                <input type="text" id="right-logo" placeholder="رابط URL للشعار" oninput="onUrlInput('right')">
+            </div>
+            <div class="input-group">
+                <label>أو رفع الشعار من الجهاز:</label>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <label for="right-logo-file" style="background:#3a7bd5; color:white; padding:9px 18px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:0.9em; white-space:nowrap; margin:0;">📁 اختر ملف</label>
+                    <input type="file" id="right-logo-file" accept="image/*" style="display:none;" onchange="onFileUpload('right')">
+                    <span id="right-file-name" style="color:#888; font-size:0.85em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">لم يتم اختيار ملف</span>
+                </div>
+            </div>
+            <div class="logo-preview-box" id="right-preview">
+                <span style="color: #444;">معاينة الشعار</span>
+            </div>
+        </div>
+
+        <div class="team-card">
+            <h2>الفريق الايسر X-Y-Z</h2>
+            <div class="input-group">
+                <label>اسم النادي/الدولة:</label>
+                <input type="text" id="left-team-name" placeholder="  ">
+            </div>
+
+            <div class="players-section">
+                <div class="input-group">
+                    <label>اللاعب الثاني:</label>
+                    <input type="text" id="left-p1" placeholder="اسم اللاعب الأساسي">
+                </div>
+                <div class="input-group">
+                    <label>صورة اللاعب (اختياري):</label>
+                    <input type="text" id="left-p1img" placeholder="رابط URL للصورة" oninput="onPlayerImgUrlInput('left')">
+                </div>
+                <div class="input-group">
+                    <label>أو رفع الصورة من الجهاز:</label>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <label for="left-p1img-file" style="background:linear-gradient(135deg,#028C46,#024F25); color:white; padding:9px 18px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:0.9em; white-space:nowrap; margin:0;">📁 اختر ملف</label>
+                        <input type="file" id="left-p1img-file" accept="image/*" style="display:none;" onchange="onPlayerImgFileUpload('left')">
+                        <span id="left-p1img-name" style="color:#888; font-size:0.85em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">لم يتم اختيار ملف</span>
+                    </div>
+                </div>
+                <div class="logo-preview-box" id="left-p1img-preview" style="height:100px;">
+                    <span style="color:#444;">معاينة صورة اللاعب</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>رابط الشعار (أونلاين):</label>
+                <input type="text" id="left-logo" placeholder="رابط URL للشعار" oninput="onUrlInput('left')">
+            </div>
+            <div class="input-group">
+                <label>أو رفع الشعار من الجهاز:</label>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <label for="left-logo-file" style="background:#3a7bd5; color:white; padding:9px 18px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:0.9em; white-space:nowrap; margin:0;">📁 اختر ملف</label>
+                    <input type="file" id="left-logo-file" accept="image/*" style="display:none;" onchange="onFileUpload('left')">
+                    <span id="left-file-name" style="color:#888; font-size:0.85em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">لم يتم اختيار ملف</span>
+                </div>
+            </div>
+            <div class="logo-preview-box" id="left-preview">
+                <span style="color: #444;">معاينة الشعار</span>
+            </div>
+        </div>
+    </div>
+<!-- Copyright (c) 2026 Saud Alhamad. All rights reserved. Licensed to STTF. -->
+
+    <div class="main-buttons">
+        <button class="save-btn" onclick="saveData()">حفظ التعديلات</button>
+    </div>
+
+
+      <script src="config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+        const firebaseConfig = APP_CONFIG.firebase;
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        let activeId = null;
+
+        function showToast(m, s) {
+            const t = document.getElementById('status-toast');
+            t.textContent = m; t.style.background = s ? '#28a745' : '#dc3545';
+            t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000);
+        }
+
+        const logoData = { left: null, right: null };
+        const playerImgData = { left: null, right: null };
+
+        function onPlayerImgUrlInput(side) {
+            playerImgData[side] = null;
+            document.getElementById(`${side}-p1img-file`).value = '';
+            document.getElementById(`${side}-p1img-name`).textContent = 'لم يتم اختيار ملف';
+            updatePlayerImgPreview(side);
+        }
+
+        function onPlayerImgFileUpload(side) {
+            const file = document.getElementById(`${side}-p1img-file`).files[0];
+            if (!file) return;
+            document.getElementById(`${side}-p1img-name`).textContent = file.name;
+            document.getElementById(`${side}-p1img`).value = '';
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                playerImgData[side] = e.target.result;
+                const box = document.getElementById(`${side}-p1img-preview`);
+                box.innerHTML = `<img src="${e.target.result}" onerror="this.parentElement.innerHTML='خطأ بالملف'">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updatePlayerImgPreview(side) {
+            const url = document.getElementById(`${side}-p1img`).value;
+            const box = document.getElementById(`${side}-p1img-preview`);
+            if (url) {
+                box.innerHTML = `<img src="${url}" onerror="this.parentElement.innerHTML='خطأ بالرابط'">`;
+            } else if (playerImgData[side]) {
+                box.innerHTML = `<img src="${playerImgData[side]}" onerror="this.parentElement.innerHTML='خطأ بالملف'">`;
+            } else {
+                box.innerHTML = '<span style="color:#444;">معاينة صورة اللاعب</span>';
+            }
+        }
+
+        function getPlayerImgValue(side) {
+            return playerImgData[side] || document.getElementById(`${side}-p1img`).value;
+        }
+
+        function onUrlInput(side) {
+   
+            logoData[side] = null;
+            document.getElementById(`${side}-logo-file`).value = '';
+            document.getElementById(`${side}-file-name`).textContent = 'لم يتم اختيار ملف';
+            updatePreview(side);
+        }
+
+        function onFileUpload(side) {
+            const file = document.getElementById(`${side}-logo-file`).files[0];
+            if (!file) return;
+            document.getElementById(`${side}-file-name`).textContent = file.name;
+            document.getElementById(`${side}-logo`).value = '';
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                logoData[side] = e.target.result; // base64 data URL
+                const box = document.getElementById(`${side}-preview`);
+                box.innerHTML = `<img src="${e.target.result}" onerror="this.parentElement.innerHTML='خطأ بالملف'">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updatePreview(side) {
+            const url = document.getElementById(`${side}-logo`).value;
+            const box = document.getElementById(`${side}-preview`);
+            if (url) {
+                box.innerHTML = `<img src="${url}" onerror="this.parentElement.innerHTML='خطأ بالرابط'">`;
+            } else if (logoData[side]) {
+                box.innerHTML = `<img src="${logoData[side]}" onerror="this.parentElement.innerHTML='خطأ بالملف'">`;
+            } else {
+                box.innerHTML = '<span style="color:#444;">معاينة الشعار</span>';
+            }
+        }
+
+        function getLogoValue(side) {
+            return logoData[side] || document.getElementById(`${side}-logo`).value;
+        }
+
+        const IS_LOCAL = ['', 'localhost', '127.0.0.1'].includes(location.hostname);
+
+        async function saveData() {
+            if(!activeId) return showToast("لا توجد مباراة نشطة!", false);
+            const teams = {
+                left: {
+                    name: document.getElementById('right-team-name').value,
+                    p1: document.getElementById('right-p1').value,
+                    p1img: getPlayerImgValue('right'),
+                    logo: getLogoValue('right')
+                },
+                right: {
+                    name: document.getElementById('left-team-name').value,
+                    p1: document.getElementById('left-p1').value,
+                    p1img: getPlayerImgValue('left'),
+                    logo: getLogoValue('left')
+                }
+            };
+            try {
+                if (IS_LOCAL) {
+                    await database.ref(`matches/${activeId}/teams`).set(teams);
+                    showToast("تم حفظ البيانات بنجاح", true);
+                } else {
+                    const res = await fetch('/.netlify/functions/s245645645', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'saveTeams', matchId: activeId, teams })
+                    });
+                    const d = await res.json();
+                    d.ok ? showToast("تم حفظ البيانات بنجاح", true) : showToast("خطأ: " + (d.error || "فشل الحفظ!"), false);
+                }
+            } catch { showToast("فشل الحفظ!", false); }
+        }
+
+        // Returns true when a teams object still carries only default placeholder values
+        function isDefaultTeams(teams) {
+            if (!teams) return true;
+            const ln = (teams.left  && teams.left.name)  || '';
+            const rn = (teams.right && teams.right.name) || '';
+            const ll = (teams.left  && teams.left.logo)  || '';
+            const rl = (teams.right && teams.right.logo) || '';
+            return ['الفريق الأول', ''].includes(ln)
+                && ['الفريق الثاني', ''].includes(rn)
+                && ['base.png', ''].includes(ll)
+                && ['base.png', ''].includes(rl);
+        }
+
+        // Fills only team name + logo from a sibling match's teams object
+        // (form mapping: right-* inputs ↔ teams.left in Firebase, left-* ↔ teams.right)
+        function applySeriesTeamsToForm(teams) {
+            const leftName = (teams.left  && teams.left.name)  || '';
+            const rightName = (teams.right && teams.right.name) || '';
+            if (leftName  && leftName  !== 'الفريق الأول')  document.getElementById('right-team-name').value = leftName;
+            if (rightName && rightName !== 'الفريق الثاني') document.getElementById('left-team-name').value  = rightName;
+
+            const leftLogo = (teams.left  && teams.left.logo)  || '';
+            if (leftLogo && leftLogo !== 'base.png') {
+                if (leftLogo.startsWith('data:')) {
+                    logoData['right'] = leftLogo;
+                    document.getElementById('right-file-name').textContent = 'تم تحميل شعار مسبقاً';
+                    document.getElementById('right-logo').value = '';
+                } else {
+                    document.getElementById('right-logo').value = leftLogo;
+                }
+                updatePreview('right');
+            }
+
+            const rightLogo = (teams.right && teams.right.logo) || '';
+            if (rightLogo && rightLogo !== 'base.png') {
+                if (rightLogo.startsWith('data:')) {
+                    logoData['left'] = rightLogo;
+                    document.getElementById('left-file-name').textContent = 'تم تحميل شعار مسبقاً';
+                    document.getElementById('left-logo').value = '';
+                } else {
+                    document.getElementById('left-logo').value = rightLogo;
+                }
+                updatePreview('left');
+            }
+        }
+
+        let _seriesFillDoneFor = null; // guard: auto-fill runs only once per active match
+
+        async function tryFillFromSeries(m, currentMatchId) {
+            if (_seriesFillDoneFor === currentMatchId) return;
+            if (!m.seriesId) return;
+            if (!isDefaultTeams(m.teams)) return; // match already has custom team data
+
+            _seriesFillDoneFor = currentMatchId;
+
+            try {
+                const seriesSnap = await database.ref(`series/${m.seriesId}`).once('value');
+                const seriesData = seriesSnap.val();
+                if (!seriesData || !Array.isArray(seriesData.matchIds)) return;
+
+                for (const sibId of seriesData.matchIds) {
+                    if (sibId === currentMatchId) continue;
+                    const sibSnap = await database.ref(`matches/${sibId}`).once('value');
+                    const sib = sibSnap.val();
+                    if (sib && sib.teams && !isDefaultTeams(sib.teams)) {
+                        applySeriesTeamsToForm(sib.teams);
+                        showToast('تم نسخ بيانات الفريق من مباراة سابقة في السلسلة', true);
+                        return;
+                    }
+                }
+            } catch(e) { /* silent — series fill is best-effort */ }
+        }
+
+        window.onload = () => {
+            database.ref('activeMatch').on('value', snap => {
+
+                activeId = snap.val();
+                if(activeId) {
+                    database.ref(`matches/${activeId}`).on('value', mSnap => {
+                        const m = mSnap.val();
+                        if(m) {
+                            document.getElementById('active-match-title').textContent = `تعديل: ${m.name || activeId}`;
+                            if(m.teams) {
+                                document.getElementById('right-team-name').value = m.teams.left?.name || "الفريق الأول";
+                                document.getElementById('right-p1').value = m.teams.left?.p1 || "";
+                                const rightLogo = m.teams.left?.logo || "";
+                                const leftLogo = m.teams.right?.logo || "";
+                                document.getElementById('right-logo').value = rightLogo.startsWith('data:') ? '' : rightLogo;
+                                if (rightLogo.startsWith('data:')) { logoData['right'] = rightLogo; document.getElementById('right-file-name').textContent = 'تم تحميل شعار مسبقاً'; }
+                                document.getElementById('left-team-name').value = m.teams.right?.name || "الفريق الثاني";
+                                document.getElementById('left-p1').value = m.teams.right?.p1 || "";
+                                const leftLogoVal = m.teams.right?.logo || "";
+                                document.getElementById('left-logo').value = leftLogoVal.startsWith('data:') ? '' : leftLogoVal;
+                                if (leftLogoVal.startsWith('data:')) { logoData['left'] = leftLogoVal; document.getElementById('left-file-name').textContent = 'تم تحميل شعار مسبقاً'; }
+                                updatePreview('right'); updatePreview('left');
+                                const rightP1img = m.teams.left?.p1img || "";
+                                document.getElementById('right-p1img').value = rightP1img.startsWith('data:') ? '' : rightP1img;
+                                if (rightP1img.startsWith('data:')) { playerImgData['right'] = rightP1img; document.getElementById('right-p1img-name').textContent = 'تم تحميل صورة مسبقاً'; }
+                                const leftP1img = m.teams.right?.p1img || "";
+                                document.getElementById('left-p1img').value = leftP1img.startsWith('data:') ? '' : leftP1img;
+                                if (leftP1img.startsWith('data:')) { playerImgData['left'] = leftP1img; document.getElementById('left-p1img-name').textContent = 'تم تحميل صورة مسبقاً'; }
+                                updatePlayerImgPreview('right'); updatePlayerImgPreview('left');
+                            }
+                            tryFillFromSeries(m, activeId);
+                        }
+                    });
+                }
+            });
+        };
+    </script>
+
+ 
+<script>
+(function () {
+    function initRipple() {
+        document.querySelectorAll('button, .save-btn, .back-btn').forEach(function (btn) {
+            if (btn.dataset.ripple) return;
+            btn.dataset.ripple = '1';
+            btn.style.position = 'relative';
+            btn.style.overflow = 'hidden';
+            btn.addEventListener('click', function (e) {
+                var r = btn.getBoundingClientRect();
+                var span = document.createElement('span');
+                span.className = 'ripple-effect';
+                var size = Math.max(r.width, r.height);
+                span.style.cssText = 'position:absolute;border-radius:50%;transform:scale(0);animation:rippleAnim 0.55s linear;pointer-events:none;background:rgba(255,255,255,0.28);width:' + size + 'px;height:' + size + 'px;left:' + (e.clientX - r.left - size / 2) + 'px;top:' + (e.clientY - r.top - size / 2) + 'px;';
+                btn.appendChild(span);
+                span.addEventListener('animationend', function () { span.remove(); });
+            });
+        });
+    }
+    function animateCards() {
+        document.querySelectorAll('.team-card').forEach(function (card, i) {
+            card.style.animation = 'cardEntrance 0.5s ease-out ' + (i * 100) + 'ms both';
+        });
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        initRipple();
+        animateCards();
+    });
+})();
+</script>
+
+</body>
+</html>

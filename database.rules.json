@@ -1,0 +1,20 @@
+{
+  "rules": {
+    ".read": true,
+    ".write": false,
+
+    "match": {
+      "timers": {
+        ".write": true
+      }
+    },
+
+    "showWinner": {
+      ".write": true
+    },
+
+    "showCongrats": {
+      ".write": true
+    }
+  }
+}

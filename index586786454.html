@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المباريات الاحترافية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Inter:wght@400;600;700&display=swap" media="print" onload="this.media='all'">
+
+    <style>
+        :root {
+          --primary-color: #028C46;
+          --primary-hover: #024F25;
+          --bg-dark: #0d1520;
+          --card-bg: #111d24;
+          --text-white: #ffffff;
+          --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          font-family: 'Inter', 'Cairo', sans-serif;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(ellipse at 50% -5%, rgba(2,140,70,0.12) 0%, transparent 52%),
+                repeating-linear-gradient(45deg, transparent, transparent 7px, rgba(2,140,70,0.025) 7px, rgba(2,140,70,0.025) 8px),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Ccircle cx='20' cy='20' r='3' fill='none' stroke='rgba(2,140,70,0.04)' stroke-width='1'/%3E%3Ccircle cx='70' cy='50' r='3' fill='none' stroke='rgba(2,140,70,0.04)' stroke-width='1'/%3E%3Ccircle cx='100' cy='90' r='3' fill='none' stroke='rgba(2,140,70,0.04)' stroke-width='1'/%3E%3C/svg%3E"),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30,4 L56,30 L30,56 L4,30 Z' fill='none' stroke='rgba(2,140,70,0.06)' stroke-width='1.2'/%3E%3Cpath d='M30,17 L43,30 L30,43 L17,30 Z' fill='none' stroke='rgba(2,140,70,0.04)' stroke-width='1'/%3E%3C/svg%3E");
+            background-size: auto, 8px 8px, 120px 120px, 60px 60px;
+            color: white;
+            font-family: 'Inter', 'Cairo', sans-serif;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #028C46, transparent);
+            z-index: 9999;
+            pointer-events: none;
+        }
+        
+        .container {
+            max-width: min(1700px, 96vw);
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: clamp(15px, 3vh, 30px);
+            font-size: clamp(1.4em, 4vw, 2.5em);
+            text-shadow: 0 4px 10px rgba(2, 79, 37, 0.4);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 0;
+            border-radius: 12px 12px 0 0;
+            overflow: hidden;
+            border: 1px solid rgba(2,140,70,0.25);
+            border-bottom: none;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 16px 20px;
+            background-color: var(--card-bg);
+            color: #888;
+            border: none;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 0;
+            font-family: 'Inter', 'Cairo', sans-serif;
+        }
+
+        .tab-btn:first-child {
+            border-left: 1px solid rgba(2,140,70,0.2);
+        }
+
+        .tab-btn.active {
+            background-color: var(--card-bg);
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background-color: rgba(2,140,70,0.07);
+            color: #ccc;
+        }
+
+        .tab-panel {
+            display: none;
+            background-color: var(--card-bg);
+            border-radius: 0 0 15px 15px;
+            padding: 38px 42px;
+            border: 1px solid rgba(2,140,70,0.25);
+            border-top: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(2,140,70,0.1);
+            margin-bottom: 30px;
+            min-width: 560px;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+        
+        .match-list h2,
+        .add-match-box h2 {
+            color: var(--primary-color);
+            margin-top: 0;
+            border-bottom: 2px solid #222;
+            padding-bottom: 15px;
+        }
+        
+        .match-item {
+            display: grid;
+            grid-template-columns: 50px 1fr 1fr auto;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 15px;
+            background-color: #162C36;
+            border-radius: 10px;
+            transition: all 0.3s;
+            border-right: 5px solid transparent;
+            border: 1px solid rgba(2,140,70,0.15);
+        }
+
+        .match-item.active {
+            border-right: 5px solid #028C46;
+            background-color: rgba(2,140,70,0.08);
+            box-shadow: 0 4px 15px rgba(2, 140, 70, 0.15);
+        }
+        
+        .match-number {
+            background-color: var(--primary-color);
+            color: white;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+        
+        .match-info-main {
+            text-align: right;
+            padding-right: 20px;
+        }
+
+        .match-info-main .name { font-weight: bold; font-size: 1.2em; display: block; }
+        .match-info-main .score-preview { color: #888; font-size: 0.9em; }
+        
+        .teams-preview {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .team-logo-small { width: 30px; height: 30px; object-fit: contain; }
+
+        .match-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; align-items: center; }
+        
+        button {
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .select-btn { background: linear-gradient(135deg, #028C46, #024F25); color: white; }
+        .select-btn:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(2,140,70,0.35); }
+        .select-btn:disabled { background: #444; cursor: default; transform: none; opacity: 0.8; }
+        
+        .delete-btn { background-color: #dc3545; color: white; }
+        .delete-btn:hover { background-color: #c82333; transform: translateY(-2px); }
+
+        .input-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .input-group { flex: 1; text-align: right; }
+        .input-group label { display: block; margin-bottom: 8px; color: #aaa; }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(2,140,70,0.25);
+            background-color: #1a2830;
+            color: white;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Cairo', sans-serif;
+            transition: border-color 0.3s;
+        }
+        .input-group input:focus { outline: none; border-color: #028C46; }
+
+        .create-btn {
+            background: linear-gradient(135deg, #028C46, #024F25);
+            color: white;
+            width: 100%;
+            font-size: 1.1em;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(2,140,70,0.3);
+        }
+        .create-btn:hover { filter: brightness(1.1); box-shadow: 0 8px 25px rgba(2,140,70,0.35); }
+
+        .back-link {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 999;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+            background: rgba(13,21,32,0.9);
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(2,140,70,0.35);
+            backdrop-filter: blur(4px);
+        }
+        .back-link:hover { text-shadow: 0 0 10px rgba(2,140,70,0.8); border-color: #028C46; box-shadow: 0 4px 12px rgba(2,140,70,0.25); }
+
+        .status-msg {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            padding: 12px 25px; border-radius: 8px; font-weight: bold; display: none; z-index: 100;
+        }
+
+        .edit-btn { background-color: #e67e22; color: white; }
+        .edit-btn:hover { background-color: #ca6f1e; transform: translateY(-2px); }
+
+        .repeat-btn { background-color: #1a6fa8; color: white; }
+        .repeat-btn:hover { background-color: #155d8e; transform: translateY(-2px); }
+
+        .match-actions button {
+            padding: 12px 20px;
+            font-size: 1em;
+            white-space: nowrap;
+            min-width: 80px;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+
+        .modal-box {
+            background: var(--card-bg);
+            border: 1px solid rgba(2,140,70,0.35);
+            border-radius: 14px;
+            padding: 30px;
+            width: 400px;
+            max-width: 90%;
+            text-align: right;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8), inset 0 1px 0 rgba(2,140,70,0.15);
+            animation: popIn 0.2s ease;
+        }
+        @keyframes popIn {
+            from { transform: scale(0.85); opacity: 0; }
+            to   { transform: scale(1);    opacity: 1; }
+        }
+        .modal-box h3 { color: var(--primary-color); margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 12px; }
+        .modal-box .input-group { margin-bottom: 16px; }
+        .modal-actions { display: flex; gap: 12px; margin-top: 20px; justify-content: flex-end; }
+        .save-edit-btn { background: linear-gradient(135deg, #028C46, #024F25); color: white; flex: 1; }
+        .save-edit-btn:hover { filter: brightness(1.1); box-shadow: 0 4px 12px rgba(2,140,70,0.35); }
+        .cancel-edit-btn { background-color: #444; color: white; flex: 1; }
+        .cancel-edit-btn:hover { background-color: #555; }
+
+        .container { position: relative; }
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 380px;
+            height: 380px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50,2 L98,50 L50,98 L2,50 Z' fill='%23028C46'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
+        }
+        a[download] {
+            background: #162C36 !important;
+            color: #028C46 !important;
+            border: 1px solid #028C46 !important;
+        }
+        a[download]:hover {
+            background: #028C46 !important;
+            color: #ffffff !important;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .container { max-width: 100%; }
+            .match-item {
+                grid-template-columns: 40px 1fr 120px;
+                grid-template-rows: auto auto;
+                gap: 8px;
+                padding: 14px;
+            }
+            .teams-preview { display: none; }
+            .match-actions { justify-content: flex-start; flex-wrap: wrap; gap: 6px; }
+            .tab-btn { font-size: 0.88em; padding: 12px 10px; }
+            .input-row { flex-direction: column; gap: 12px; }
+            .modal-box { width: 95%; padding: 20px 16px; }
+            .back-link { position: static; display: inline-block; margin-bottom: 16px; }
+        }
+
+        @media (max-width: 480px) {
+            .match-item {
+                grid-template-columns: 36px 1fr;
+                padding: 12px;
+            }
+            .match-actions { grid-column: 1 / -1; }
+            .match-info-main .name { font-size: 1em; }
+            button { padding: 8px 12px; font-size: 0.9em; }
+            .create-btn { font-size: 1em; padding: 12px; }
+            #cols-toggle-btn, #edit-cols-toggle-btn { flex-wrap: wrap; }
+        }
+
+        @keyframes topBarShimmer {
+            0%   { opacity: 0; filter: brightness(1); }
+            50%  { opacity: 1; filter: brightness(1.8); }
+            100% { opacity: 1; filter: brightness(1); }
+        }
+        body::before { animation: topBarShimmer 1.5s ease-out 1 forwards; }
+
+        @keyframes tabSlideIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .tab-panel.active { animation: tabSlideIn 0.3s ease-out both; }
+
+        @keyframes activeBorderPulse {
+            0%, 100% { box-shadow: 0 4px 15px rgba(2,140,70,0.15); }
+            50%       { box-shadow: 0 4px 28px rgba(2,140,70,0.45); }
+        }
+        .match-item.active { animation: activeBorderPulse 2s ease-in-out infinite; }
+
+        .match-item:hover { transform: translateX(-4px); }
+
+        @keyframes modalGlow {
+            from { filter: drop-shadow(0 0 0px rgba(2,140,70,0)); }
+            to   { filter: drop-shadow(0 0 14px rgba(2,140,70,0.45)); }
+        }
+        .modal-overlay.open .modal-box { animation: popIn 0.2s ease, modalGlow 0.5s ease-out 0.2s forwards; }
+
+        button:active { transform: scale(0.96); }
+        .input-group input:focus { box-shadow: 0 0 0 3px rgba(2,140,70,0.25); }
+
+        @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
+
+        .creation-mode-toggle {
+            display: inline-flex;
+            align-items: center;
+            background: #111;
+            border: 1px solid #2a2a2a;
+            border-radius: 10px;
+            padding: 4px;
+            gap: 4px;
+            margin-bottom: 20px;
+        }
+        .creation-mode-toggle button {
+            padding: 8px 20px;
+            border-radius: 7px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9em;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: transparent;
+            color: #555;
+            white-space: nowrap;
+        }
+        .creation-mode-toggle button.active-mode {
+            background: #1E9847;
+            color: #fff;
+        }
+
+        .series-header {
+            background: rgba(2,140,70,0.12);
+            border: 1px solid rgba(2,140,70,0.4);
+            border-radius: 8px;
+            padding: 10px 16px;
+            color: #1E9847;
+            font-weight: bold;
+            margin-bottom: 6px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1em;
+            cursor: pointer;
+            user-select: none;
+        }
+        .series-header:hover {
+            background: rgba(2,140,70,0.2);
+            border-color: rgba(2,140,70,0.7);
+        }
+        .series-toggle-icon {
+            font-style: normal;
+            font-size: 0.85em;
+            margin-right: 8px;
+            transition: transform 0.25s ease;
+            display: inline-block;
+        }
+        .series-group-body {
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.25s ease;
+            max-height: 2000px;
+            opacity: 1;
+        }
+        .series-group-body.collapsed {
+            max-height: 0;
+            opacity: 0;
+        }
+
+        .series-match-item {
+            padding-right: 20px !important;
+            border-right: 3px solid rgba(2,140,70,0.3) !important;
+        }
+    </style>
+</head>
+<body>
+    <div style="position:fixed;top:0;left:0;right:0;z-index:100;height:4px;background:linear-gradient(90deg,#162B32 0%,#1E9847 40%,#25c45a 60%,#162B32 100%);"></div>
+
+    <div class="container">
+        <h1>إدارة مباريات كرة الطاولة</h1>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('add')">إضافة مباراة جديدة</button>
+            <button class="tab-btn" onclick="switchTab('list')"> قائمة المباريات المحفوظة</button>
+        </div>
+
+        <div id="tab-add" class="tab-panel add-match-box active">
+            <h2>إضافة مباراة جديدة</h2>
+
+            <div style="text-align:center;">
+                <div class="creation-mode-toggle">
+                    <button id="mode-single" class="active-mode" onclick="setCreationMode('single')">مباراة فردية</button>
+                    <button id="mode-series" onclick="setCreationMode('series')">سلسلة مباريات</button>
+                </div>
+            </div>
+
+            <!-- Single match fields -->
+            <div id="single-match-fields">
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>اسم المباراة:</label>
+                        <input type="text" id="match-name" placeholder="مثلاً: نهائي بطولة المنطقة">
+                    </div>
+                    <div class="input-group" style="flex: 0.3;">
+                        <label>رقم المباراة:</label>
+                        <input type="number" id="match-number" placeholder="1" min="1">
+                    </div>
+                    <div class="input-group" style="flex: 0.5;">
+                        <label>عدد الأشواط:</label>
+                        <div id="cols-toggle-btn" style="display:inline-flex; align-items:center; background:#111; border:1px solid #2a2a2a; border-radius:10px; padding:4px; gap:4px;">
+                            <button onclick="setGameColumns(7)" id="col-opt-7" style="padding:8px 14px; border-radius:7px; border:none; cursor:pointer; font-weight:bold; font-size:0.9em; font-family:inherit; transition:all 0.2s; background:transparent; color:#555; white-space:nowrap;">7 أشواط</button>
+                            <button onclick="setGameColumns(5)" id="col-opt-5" style="padding:8px 14px; border-radius:7px; border:none; cursor:pointer; font-weight:bold; font-size:0.9em; font-family:inherit; transition:all 0.2s; background:#1E9847; color:#fff; white-space:nowrap;">5 أشواط</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Series match fields -->
+            <div id="series-match-fields" style="display:none;">
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>اسم البطولة:</label>
+                        <input type="text" id="series-name" placeholder="دوري جاهز   ">
+                    </div>
+                    <div class="input-group" style="flex: 0.7;">
+                        <label>رقم بداية المباريات:</label>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <input type="number" id="series-start-num" placeholder="1" min="1" style="flex:1;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background:#1a1a1a; border-radius:12px; padding:20px; margin-bottom:20px; border:1px solid #2a2a2a;">
+                <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #333; padding-bottom:10px; margin-bottom:15px;">
+                    <h3 style="color:#1E9847; margin:0;">رعاة البطولة</h3>
+                    <button onclick="addSponsorRow()" style="background:#1E9847; color:#fff; border:none; border-radius:8px; padding:8px 16px; font-weight:bold; cursor:pointer; font-size:0.9em;">+ إضافة راعي</button>
+                </div>
+                <div id="sponsors-list"></div>
+            </div>
+
+            <button class="create-btn" id="create-btn-main" onclick="handleCreate()">إنشاء وتفعيل المباراة الآن</button>
+        </div>
+
+        <div id="tab-list" class="tab-panel match-list">
+            <h2>قائمة المباريات المحفوظة</h2>
+            <div id="matches-container">
+                <p style="color: #666;">جاري تحميل القائمة...</p>
+            </div>
+        </div>
+        
+        <a href="index.html" class="back-link">← العودة للقائمة الرئسية</a>
+
+
+    <div id="edit-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3>&#9998; تعديل بيانات المباراة</h3>
+            <input type="hidden" id="edit-match-id">
+            <div class="input-group">
+                <label>اسم المباراة:</label>
+                <input type="text" id="edit-match-name" placeholder="اسم المباراة">
+            </div>
+            <div class="input-group">
+                <label>رقم المباراة:</label>
+                <input type="number" id="edit-match-number" placeholder="الرقم" min="1">
+            </div>
+            <div class="input-group">
+                <label>عدد الأشواط:</label>
+                <div id="edit-cols-toggle-btn" style="display:inline-flex; align-items:center; background:#111; border:1px solid #2a2a2a; border-radius:10px; padding:4px; gap:4px;">
+                    <button onclick="setEditGameColumns(7)" id="edit-col-opt-7" style="padding:8px 14px; border-radius:7px; border:none; cursor:pointer; font-weight:bold; font-size:0.9em; font-family:inherit; transition:all 0.2s; background:transparent; color:#555; white-space:nowrap;">7 أشواط</button>
+                    <button onclick="setEditGameColumns(5)" id="edit-col-opt-5" style="padding:8px 14px; border-radius:7px; border:none; cursor:pointer; font-weight:bold; font-size:0.9em; font-family:inherit; transition:all 0.2s; background:#1E9847; color:#fff; white-space:nowrap;">5 أشواط</button>
+                </div>
+            </div>
+            <div style="border-top:1px solid #333; margin:15px 0; padding-top:15px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                    <label style="color:#1E9847; font-weight:bold;">رعاة البطولة:</label>
+                    <button onclick="addEditSponsorRow()" style="background:#1E9847; color:#fff; border:none; border-radius:6px; padding:5px 12px; font-weight:bold; cursor:pointer; font-size:0.85em;">+ إضافة</button>
+                </div>
+                <div id="edit-sponsors-list" style="max-height:220px; overflow-y:auto;"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="save-edit-btn" onclick="saveEdit()">حفظ التعديلات</button>
+                <button class="cancel-edit-btn" onclick="closeEdit()">الغاء</button>
+            </div>
+        </div>
+    </div>
+<!-- Copyright (c) 2026 Saud Alhamad. All rights reserved. Licensed to STTF. -->
+
+    <div id="status-msg" class="status-msg"></div>
+
+      <script src="config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+
+            var panel;
+            if (tab === 'add') {
+                panel = document.getElementById('tab-add');
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            } else {
+                panel = document.getElementById('tab-list');
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            }
+            panel.style.animation = 'none';
+            void panel.offsetWidth;
+            panel.style.animation = '';
+            panel.classList.add('active');
+        }
+
+        const firebaseConfig = APP_CONFIG.firebase;
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        let currentActiveId = null;
+
+        const IS_LOCAL = true; 
+
+        async function callFn(body) {
+            if (IS_LOCAL) return localFn(body);
+            const res = await fetch('/.netlify/functions/s245645645', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            return res.json();
+        }
+
+        async function localFn(body) {
+            const { action } = body;
+            switch (action) {
+                case 'createMatch':
+                    await database.ref(`matches/${body.key}`).set(body.matchData); break;
+                case 'setActiveMatch':
+                    await database.ref('activeMatch').set(body.id); break;
+                case 'deleteMatch':
+                    await database.ref(`matches/${body.matchId}`).remove(); break;
+                case 'updateMatchMeta':
+                    await database.ref(`matches/${body.matchId}`).update(body.updates); break;
+                case 'setGameColumns':
+                    await database.ref('settings/gameColumns').set(body.cols); break;
+                case 'writeSeries':
+                    await database.ref(`series/${body.seriesId}`).set(body.seriesData); break;
+                case 'deleteSeries':
+                    await database.ref(`series/${body.seriesId}`).remove();
+                    for (const mid of body.matchIds) await database.ref(`matches/${mid}`).remove();
+                    break;
+                default:
+                    console.warn('localFn: unknown action', action);
+            }
+            return { ok: true };
+        }
+        
+        function showMsg(text, isSuccess) {
+            const el = document.getElementById('status-msg');
+            el.textContent = text;
+            el.style.backgroundColor = isSuccess ? '#28a745' : '#dc3545';
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 3000);
+        }
+
+        let sponsorCount = 0;
+        const sponsorLogoData = {}; 
+
+        function addSponsorRow(name, logo) {
+            sponsorCount++;
+            const id = sponsorCount;
+            const isBase64 = logo && logo.startsWith('data:');
+            if (isBase64) sponsorLogoData[id] = logo;
+            const row = document.createElement('div');
+            row.id = `sponsor-row-${id}`;
+            row.style.cssText = "display:flex; gap:15px; align-items:flex-start; flex-wrap:wrap; margin-bottom:15px; padding:15px; background:#111; border-radius:10px; border:1px solid #2a2a2a;";
+            row.innerHTML = `
+                <div style="flex:1; min-width:200px; text-align:right;">
+                    <div class="input-group">
+                        <label>اسم الراعي:</label>
+                        <input type="text" id="sponsor-name-${id}" placeholder="مثال: شركة الراعي" value="${name || ''}">
+                    </div>
+                    <div class="input-group">
+                        <label>رابط شعار الراعي (أونلاين):</label>
+                        <input type="text" id="sponsor-logo-${id}" placeholder="رابط URL للشعار" value="${isBase64 ? '' : (logo || '')}" oninput="onSponsorUrlInput(${id})">
+                    </div>
+                    <div class="input-group">
+                        <label>أو رفع الشعار من الجهاز:</label>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <label for="sponsor-logo-file-${id}" style="background:#3a7bd5; color:white; padding:7px 14px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:0.85em; white-space:nowrap; margin:0;">📁 اختر ملف</label>
+                            <input type="file" id="sponsor-logo-file-${id}" accept="image/*" style="display:none;" onchange="onSponsorFileUpload(${id})">
+                            <span id="sponsor-file-name-${id}" style="color:#888; font-size:0.8em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${isBase64 ? 'تم تحميل شعار مسبقاً' : 'لم يتم اختيار ملف'}</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="flex:0 0 120px; text-align:center;">
+                    <label style="color:#1E9847; font-size:0.85em; display:block; margin-bottom:6px;">معاينة</label>
+                    <div id="sponsor-preview-${id}" style="background:#0a0a0a; border-radius:8px; height:80px; display:flex; align-items:center; justify-content:center; border:2px dashed #333; margin-bottom:8px;">
+                        <span style="color:#444; font-size:0.8em;">شعار</span>
+                    </div>
+                    <button onclick="removeSponsorRow(${id})" style="background:#dc3545; color:white; border:none; border-radius:6px; padding:5px 12px; cursor:pointer; font-size:0.85em; width:100%;">حذف</button>
+                </div>
+                
+            `;
+            const list = document.getElementById('sponsors-list');
+            if (name === undefined) { list.prepend(row); } else { list.appendChild(row); }
+            if (logo) updateSponsorPreview(id);
+        }
+
+        function onSponsorUrlInput(id) {
+            sponsorLogoData[id] = null;
+            document.getElementById(`sponsor-logo-file-${id}`).value = '';
+            document.getElementById(`sponsor-file-name-${id}`).textContent = 'لم يتم اختيار ملف';
+            updateSponsorPreview(id);
+        }
+
+        function onSponsorFileUpload(id) {
+            const file = document.getElementById(`sponsor-logo-file-${id}`).files[0];
+            if (!file) return;
+            document.getElementById(`sponsor-file-name-${id}`).textContent = file.name;
+            document.getElementById(`sponsor-logo-${id}`).value = '';
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                sponsorLogoData[id] = e.target.result;
+                const box = document.getElementById(`sponsor-preview-${id}`);
+                box.innerHTML = `<img src="${e.target.result}" style="max-width:90%; max-height:70px; object-fit:contain;" onerror="this.parentElement.innerHTML='<span style=color:#f00>خطأ</span>'">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeSponsorRow(id) {
+            const row = document.getElementById(`sponsor-row-${id}`);
+            if (row) row.remove();
+            delete sponsorLogoData[id];
+        }
+
+        function updateSponsorPreview(id) {
+            const url = document.getElementById(`sponsor-logo-${id}`)?.value;
+            const box = document.getElementById(`sponsor-preview-${id}`);
+            const b64 = sponsorLogoData[id];
+            const src = b64 || url;
+            box.innerHTML = src
+                ? `<img src="${src}" style="max-width:90%; max-height:70px; object-fit:contain;" onerror="this.parentElement.innerHTML='<span style=color:#f00>خطأ</span>'">`
+                : '<span style="color:#444; font-size:0.8em;">شعار</span>';
+        }
+
+        function getSponsorLogoValue(id) {
+            return sponsorLogoData[id] || document.getElementById(`sponsor-logo-${id}`)?.value.trim() || '';
+        }
+
+        function getSponsors() {
+            const sponsors = [];
+            document.querySelectorAll('[id^="sponsor-row-"]').forEach(row => {
+                const id = row.id.replace('sponsor-row-', '');
+                const name = document.getElementById(`sponsor-name-${id}`)?.value.trim() || '';
+                const logo = getSponsorLogoValue(id);
+                if (name || logo) sponsors.push({ name, logo });
+            });
+            return sponsors;
+        }
+
+        window.addEventListener('DOMContentLoaded', () => addSponsorRow());
+
+        function createNewMatch() {
+            const name = document.getElementById('match-name').value.trim();
+            const num  = document.getElementById('match-number').value.trim();
+
+            if (!name || !num) {
+                showMsg('يرجى تعبئة جميع الحقول', false);
+                return;
+            }
+
+            const parsedNum = parseInt(num);
+            if (isNaN(parsedNum) || parsedNum < 1) {
+                showMsg('رقم المباراة يجب أن يكون رقماً صحيحاً أكبر من صفر', false);
+                return;
+            }
+
+            const matchId = "M" + parsedNum;
+
+            database.ref(`matches/${matchId}`).once('value')
+                .then(snap => {
+                    if (snap.exists()) {
+                        showMsg('مباراة برقم ' + parsedNum + ' موجودة بالفعل — اختر رقماً آخر', false);
+                        return;
+                    }
+
+                    const matchData = {
+                        name:       name,
+                        number:     parsedNum,
+                        gameScore:  '0 - 0',
+                        matchScore: '0 - 0',
+                        setScore:   '0 - 0',
+                        serve:      'center',
+                        teams: {
+                            left:  { name: 'الفريق الأول',  logo: 'base.png' },
+                            right: { name: 'الفريق الثاني', logo: 'base.png' }
+                        },
+                        sponsors: getSponsors(),
+                        cards: { leftCard: false, rightCard: false, leftYR1: false, leftYR2: false,
+                                 rightYR1: false, rightYR2: false, leftWhite: false, rightWhite: false },
+                        createdAt: Date.now()
+                    };
+
+                    callFn({ action: 'createMatch', key: matchId, matchData })
+                    .then(d => {
+                        if (!d.ok) { showMsg('خطأ: ' + d.error, false); return; }
+                        return callFn({ action: 'setActiveMatch', id: matchId });
+                    }).then(() => {
+                        showMsg('تم إنشاء وتفعيل المباراة بنجاح — رقم المباراة: ' + parsedNum, true);
+                        document.getElementById('match-name').value   = '';
+                        document.getElementById('match-number').value = '';
+                        document.getElementById('sponsors-list').innerHTML = '';
+                        sponsorCount = 0;
+                        addSponsorRow();
+                        switchTab('list');
+                    }).catch(err => showMsg('خطأ: ' + err.message, false));
+                })
+                .catch(err => showMsg('خطأ في التحقق: ' + err.message, false));
+        }
+
+        let creationMode = 'single';
+        const seriesMatchCount = 5;
+        let _expandedSeriesId = null;
+
+        function setCreationMode(mode) {
+            creationMode = mode;
+            document.getElementById('single-match-fields').style.display = mode === 'single' ? '' : 'none';
+            document.getElementById('series-match-fields').style.display = mode === 'series' ? '' : 'none';
+            document.getElementById('mode-single').classList.toggle('active-mode', mode === 'single');
+            document.getElementById('mode-series').classList.toggle('active-mode', mode === 'series');
+            document.getElementById('create-btn-main').textContent =
+                mode === 'series' ? 'إنشاء السلسلة' : 'إنشاء وتفعيل المباراة الآن';
+        }
+
+        function handleCreate() {
+            if (creationMode === 'series') createNewSeries();
+            else createNewMatch();
+        }
+
+        async function createNewSeries() {
+            const seriesName = document.getElementById('series-name').value.trim();
+            const startNum   = parseInt(document.getElementById('series-start-num').value.trim());
+
+            if (!seriesName) { showMsg('يرجى إدخال اسم السلسلة', false); return; }
+            if (isNaN(startNum) || startNum < 1) {
+                showMsg('رقم بداية المباريات يجب أن يكون رقماً صحيحاً أكبر من صفر', false); return;
+            }
+
+            const matchIds = [];
+            for (let i = 0; i < seriesMatchCount; i++) matchIds.push('M' + (startNum + i));
+
+            try {
+                const checks = await Promise.all(matchIds.map(id => database.ref(`matches/${id}`).once('value')));
+                for (let i = 0; i < checks.length; i++) {
+                    if (checks[i].exists()) {
+                        showMsg('مباراة برقم ' + (startNum + i) + ' موجودة بالفعل — اختر رقم بداية آخر', false);
+                        return;
+                    }
+                }
+            } catch (err) { showMsg('خطأ في التحقق: ' + err.message, false); return; }
+
+            const seriesId = 'S' + Date.now();
+            const sponsors = getSponsors();
+            const now = Date.now();
+            const ordinals = ['الأولى','الثانية','الثالثة','الرابعة','الخامسة','السادسة','السابعة'];
+
+            try {
+                for (let i = 0; i < seriesMatchCount; i++) {
+                    const ordinal = ordinals[i] || ('مباراة ' + (i + 1));
+                    const matchData = {
+                        name:       seriesName + ' - ( المباراة ' + ordinal + ' )',
+                        number:     startNum + i,
+                        seriesId:   seriesId,
+                        gameScore:  '0 - 0',
+                        matchScore: '0 - 0',
+                        setScore:   '0 - 0',
+                        serve:      'center',
+                        teams: {
+                            left:  { name: 'الفريق الأول',  logo: 'base.png' },
+                            right: { name: 'الفريق الثاني', logo: 'base.png' }
+                        },
+                        sponsors: sponsors,
+                        cards: { leftCard: false, rightCard: false, leftYR1: false, leftYR2: false,
+                                 rightYR1: false, rightYR2: false, leftWhite: false, rightWhite: false },
+                        createdAt: now + i
+                    };
+                    await callFn({ action: 'createMatch', key: matchIds[i], matchData });
+                }
+                await callFn({ action: 'writeSeries', seriesId,
+                    seriesData: { name: seriesName, matchIds, createdAt: now } });
+                await callFn({ action: 'setActiveMatch', id: matchIds[0] });
+
+                showMsg('تم إنشاء السلسلة بنجاح — ' + seriesMatchCount + ' مباريات', true);
+                document.getElementById('series-name').value     = '';
+                document.getElementById('series-start-num').value = '';
+                document.getElementById('sponsors-list').innerHTML = '';
+                sponsorCount = 0;
+                addSponsorRow();
+                setCreationMode('single');
+                switchTab('list');
+            } catch (err) { showMsg('خطأ: ' + err.message, false); }
+        }
+
+        function selectMatch(id) {
+            callFn({ action: 'setActiveMatch', id })
+            .then(() => showMsg('تم تبديل المباراة النشطة', true));
+        }
+
+        function deleteMatch(id) {
+            if (confirm('هل أنت متأكد من حذف هذه المباراة نهائياً؟')) {
+                callFn({ action: 'deleteMatch', matchId: id })
+                .then(() => showMsg('تم الحذف بنجاح', true));
+            }
+        }
+
+        function deleteSeries(seriesId, matchIds) {
+            if (confirm('هل أنت متأكد من حذف السلسلة وجميع مبارياتها نهائياً؟')) {
+                callFn({ action: 'deleteSeries', seriesId, matchIds })
+                .then(() => showMsg('تم حذف السلسلة بنجاح', true));
+            }
+        }
+
+        function duplicateMatch(sourceId) {
+            database.ref(`matches/${sourceId}`).once('value').then(snap => {
+                const sourceMatch = snap.val();
+                if (!sourceMatch) { showMsg('لم يتم العثور على المباراة المصدر', false); return; }
+
+                const newNumber = sourceMatch.number + 1;
+                const newMatchId = 'M' + newNumber;
+
+                database.ref(`matches/${newMatchId}`).once('value').then(existSnap => {
+                    if (existSnap.exists()) {
+                        showMsg('مباراة برقم ' + newNumber + ' موجودة بالفعل', false);
+                        return;
+                    }
+
+                    const matchData = {
+                        name:       sourceMatch.name || '',
+                        number:     newNumber,
+                        gameScore:  '0 - 0',
+                        matchScore: '0 - 0',
+                        setScore:   '0 - 0',
+                        serve:      'center',
+                        teams: {
+                            left:  { name: sourceMatch.teams?.left?.name  || '', logo: sourceMatch.teams?.left?.logo  || 'base.png' },
+                            right: { name: sourceMatch.teams?.right?.name || '', logo: sourceMatch.teams?.right?.logo || 'base.png' }
+                        },
+                        sponsors:   sourceMatch.sponsors || [],
+                        cards: { leftCard: false, rightCard: false, leftYR1: false, leftYR2: false,
+                                 rightYR1: false, rightYR2: false, leftWhite: false, rightWhite: false },
+                        createdAt:  Date.now()
+                    };
+
+                    callFn({ action: 'createMatch', key: newMatchId, matchData })
+                    .then(() => callFn({ action: 'setActiveMatch', id: newMatchId }))
+                    .then(() => showMsg('تم تكرار المباراة برقم ' + newNumber + ' بنجاح', true))
+                    .catch(err => showMsg('خطأ: ' + err.message, false));
+                }).catch(err => showMsg('خطأ في التحقق: ' + err.message, false));
+            }).catch(err => showMsg('خطأ في قراءة المباراة: ' + err.message, false));
+        }
+
+        function buildMatchItem(m, activeId, isSeries) {
+            const isActive = m.id === activeId;
+            const div = document.createElement('div');
+            div.className = 'match-item' + (isActive ? ' active' : '') + (isSeries ? ' series-match-item' : '');
+            const editBtn = document.createElement('button');
+            editBtn.className = 'edit-btn';
+            editBtn.textContent = 'تعديل';
+            editBtn.onclick = () => openEdit(m.id, m.name, m.number);
+            div.innerHTML = `
+                <div class="match-number">${m.number || '#'}</div>
+                <div class="match-info-main">
+                    <span class="name">${m.name}</span>
+                    <span class="score-preview">النتيجة: ${m.matchScore || '0 - 0'}</span>
+                </div>
+                <div class="teams-preview">
+                    <img src="${m.teams?.left?.logo || ''}" class="team-logo-small">
+                    <span>vs</span>
+                    <img src="${m.teams?.right?.logo || ''}" class="team-logo-small">
+                </div>
+                <div class="match-actions">
+                    <button class="select-btn" onclick="selectMatch('${m.id}')" ${isActive ? 'disabled' : ''}>
+                        ${isActive ? 'نشطة الآن' : 'تفعيل'}
+                    </button>
+                    <button class="repeat-btn" onclick="duplicateMatch('${m.id}')">تكرار المباراة</button>
+                    <span class="edit-placeholder"></span>
+                    <button class="delete-btn" onclick="deleteMatch('${m.id}')">حذف</button>
+                </div>
+            `;
+            div.querySelector('.edit-placeholder').replaceWith(editBtn);
+            return div;
+        }
+
+        function renderMatches(matches, activeId, seriesMap) {
+            seriesMap = seriesMap || {};
+            const container = document.getElementById('matches-container');
+            if (!matches) {
+                container.innerHTML = '<p style="color: #666;">لا توجد مباريات حالياً</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            const sorted = Object.keys(matches).map(k => ({id: k, ...matches[k]}))
+                            .sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+            // Group series matches; maintain first-appearance order
+            const seriesGroups  = {};  // seriesId -> [match, ...]
+            const renderedSeries = new Set();
+            const renderList = [];
+
+            sorted.forEach(m => {
+                if (m.seriesId) {
+                    if (!seriesGroups[m.seriesId]) seriesGroups[m.seriesId] = [];
+                    seriesGroups[m.seriesId].push(m);
+                    if (!renderedSeries.has(m.seriesId)) {
+                        renderedSeries.add(m.seriesId);
+                        renderList.push({ type: 'series', seriesId: m.seriesId });
+                    }
+                } else {
+                    renderList.push({ type: 'match', match: m });
+                }
+            });
+
+            renderList.forEach(item => {
+                if (item.type === 'match') {
+                    container.appendChild(buildMatchItem(item.match, activeId, false));
+                    return;
+                }
+
+                const sid = item.seriesId;
+                const groupMatches = seriesGroups[sid];
+                const seriesInfo   = seriesMap[sid] || {};
+                const seriesName   = seriesInfo.name || sid;
+
+                // Calculate series score (only count decided sets)
+                let leftWins = 0, rightWins = 0;
+                groupMatches.forEach(m => {
+                    const parts = (m.matchScore || '0 - 0').split(' - ');
+                    const l = parseInt(parts[0]) || 0;
+                    const r = parseInt(parts[1]) || 0;
+                    if (l > 0 || r > 0) {
+                        if (l > r) leftWins++;
+                        else if (r > l) rightWins++;
+                    }
+                });
+
+                const firstMatch = groupMatches[0];
+                const leftTeam   = (firstMatch.teams && firstMatch.teams.left  && firstMatch.teams.left.name)  || '';
+                const rightTeam  = (firstMatch.teams && firstMatch.teams.right && firstMatch.teams.right.name) || '';
+
+                const body = document.createElement('div');
+                body.className = 'series-group-body';
+
+                groupMatches.forEach(m => body.appendChild(buildMatchItem(m, activeId, true)));
+
+                const header = document.createElement('div');
+                header.className = 'series-header';
+                header.innerHTML =
+                    `<span><i class="series-toggle-icon">▼</i> ${seriesName}</span>` +
+                    `<span style="display:flex;align-items:center;gap:12px;">` +
+                    `<span>${leftTeam} &nbsp;${leftWins} — ${rightWins}&nbsp; ${rightTeam}</span>` +
+                    `<button class="delete-btn series-delete-btn" style="padding:4px 10px;font-size:0.8em;">حذف السلسلة</button>` +
+                    `</span>`;
+
+                header.querySelector('.series-delete-btn').addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    deleteSeries(sid, groupMatches.map(m => m.id));
+                });
+
+                header.addEventListener('click', function () {
+                    const collapsed = body.classList.toggle('collapsed');
+                    header.querySelector('.series-toggle-icon').style.transform = collapsed ? 'rotate(-90deg)' : '';
+                });
+
+                container.appendChild(header);
+                container.appendChild(body);
+            });
+        }
+
+        let editSponsorCount = 0;
+        const editSponsorLogoData = {}; 
+
+        function addEditSponsorRow(name, logo) {
+            editSponsorCount++;
+            const id = editSponsorCount;
+            const isBase64 = logo && logo.startsWith('data:');
+            if (isBase64) editSponsorLogoData[id] = logo;
+            const row = document.createElement('div');
+            row.id = `edit-sponsor-row-${id}`;
+            row.style.cssText = "margin-bottom:10px; background:#111; padding:10px; border-radius:8px; border:1px solid #2a2a2a;";
+            row.innerHTML = `
+                <div style="display:flex; gap:8px; align-items:flex-start;">
+                    <div style="flex:1;">
+                        <input type="text" id="edit-sp-name-${id}" placeholder="اسم الراعي" value="${name || ''}" style="width:100%; padding:6px; border-radius:6px; border:1px solid #333; background:#0a0a0a; color:white; margin-bottom:4px; box-sizing:border-box;">
+                        <input type="text" id="edit-sp-logo-${id}" placeholder="رابط الشعار (أونلاين)" value="${isBase64 ? '' : (logo || '')}" style="width:100%; padding:6px; border-radius:6px; border:1px solid #333; background:#0a0a0a; color:white; box-sizing:border-box;" oninput="onEditSponsorUrlInput(${id})">
+                        <div style="display:flex; align-items:center; gap:6px; margin-top:5px;">
+                            <label for="edit-sp-file-${id}" style="background:#3a7bd5; color:white; padding:5px 10px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:0.78em; white-space:nowrap; margin:0;">📁 رفع ملف</label>
+                            <input type="file" id="edit-sp-file-${id}" accept="image/*" style="display:none;" onchange="onEditSponsorFileUpload(${id})">
+                            <span id="edit-sp-file-name-${id}" style="color:#888; font-size:0.75em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${isBase64 ? 'تم تحميل شعار مسبقاً' : 'لم يتم اختيار ملف'}</span>
+                        </div>
+                    </div>
+                    <button onclick="removeEditSponsorRow(${id})" style="background:#dc3545; color:white; border:none; border-radius:6px; padding:6px 10px; cursor:pointer; flex-shrink:0; align-self:flex-start;">حذف</button>
+                </div>
+            `;
+            const editList = document.getElementById('edit-sponsors-list');
+            if (name === undefined) { editList.prepend(row); } else { editList.appendChild(row); }
+        }
+
+        function removeEditSponsorRow(id) {
+            const row = document.getElementById(`edit-sponsor-row-${id}`);
+            if (row) row.remove();
+            delete editSponsorLogoData[id];
+        }
+
+        function onEditSponsorUrlInput(id) {
+            editSponsorLogoData[id] = null;
+            document.getElementById(`edit-sp-file-${id}`).value = '';
+            document.getElementById(`edit-sp-file-name-${id}`).textContent = 'لم يتم اختيار ملف';
+        }
+
+        function onEditSponsorFileUpload(id) {
+            const file = document.getElementById(`edit-sp-file-${id}`).files[0];
+            if (!file) return;
+            document.getElementById(`edit-sp-file-name-${id}`).textContent = file.name;
+            document.getElementById(`edit-sp-logo-${id}`).value = '';
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                editSponsorLogoData[id] = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function getEditSponsors() {
+            const sponsors = [];
+            document.querySelectorAll('[id^="edit-sponsor-row-"]').forEach(row => {
+                const id = row.id.replace('edit-sponsor-row-', '');
+                const name = document.getElementById(`edit-sp-name-${id}`)?.value.trim() || '';
+                const logo = editSponsorLogoData[id] || document.getElementById(`edit-sp-logo-${id}`)?.value.trim() || '';
+                if (name || logo) sponsors.push({ name, logo });
+            });
+            return sponsors;
+        }
+
+        function openEdit(id, name, number) {
+            document.getElementById('edit-match-id').value = id;
+            document.getElementById('edit-match-name').value = name || '';
+            document.getElementById('edit-match-number').value = number || '';
+            updateEditColsUI(currentCols);
+            document.getElementById('edit-sponsors-list').innerHTML = '';
+            editSponsorCount = 0;
+            Object.keys(editSponsorLogoData).forEach(k => delete editSponsorLogoData[k]);
+            database.ref(`matches/${id}/sponsors`).once('value', snap => {
+                const existing = snap.val();
+                if (existing && Array.isArray(existing) && existing.length > 0) {
+                    existing.forEach(sp => addEditSponsorRow(sp.name, sp.logo));
+                } else {
+                    addEditSponsorRow();
+                }
+            });
+            document.getElementById('edit-modal').classList.add('open');
+        }
+
+        function closeEdit() {
+            document.getElementById('edit-modal').classList.remove('open');
+        }
+
+        function saveEdit() {
+            const id = document.getElementById('edit-match-id').value;
+            const name = document.getElementById('edit-match-name').value.trim();
+            const number = document.getElementById('edit-match-number').value.trim();
+
+            if (!name || !number) {
+                showMsg('يرجى تعبئة جميع الحقول', false);
+                return;
+            }
+
+            const updatedSponsors = getEditSponsors();
+            Promise.all([
+                callFn({ action: 'updateMatchMeta', matchId: id,
+                    updates: { name, number: parseInt(number), sponsors: updatedSponsors } }),
+                callFn({ action: 'setGameColumns', cols: editCurrentCols })
+            ]).then(() => {
+                showMsg('تم تعديل بيانات المباراة بنجاح', true);
+                closeEdit();
+            }).catch(err => showMsg('خطأ: ' + err.message, false));
+        }
+
+        document.getElementById('edit-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeEdit();
+        });
+
+        function loadMatches() {
+            let currentMatchesData = null;
+            let currentSeriesMap   = {};
+
+            database.ref('activeMatch').on('value', activeSnap => {
+                currentActiveId = activeSnap.val();
+                if (currentMatchesData !== null)
+                    renderMatches(currentMatchesData, currentActiveId, currentSeriesMap);
+            });
+
+            database.ref('matches').on('value', snap => {
+                currentMatchesData = snap.val();
+                renderMatches(currentMatchesData, currentActiveId, currentSeriesMap);
+            });
+
+            database.ref('series').on('value', snap => {
+                currentSeriesMap = snap.val() || {};
+                if (currentMatchesData !== null)
+                    renderMatches(currentMatchesData, currentActiveId, currentSeriesMap);
+            });
+        }
+
+        window.onload = function() {
+            loadMatches();
+            database.ref('settings/gameColumns').on('value', snap => {
+                const cols = snap.val() || 5;
+                updateColsUI(cols);
+            });
+        };
+
+        let currentCols = 5;
+
+        function setGameColumns(n) {
+            callFn({ action: 'setGameColumns', cols: n })
+            .then(() => showMsg('تم تغيير عدد الأشواط إلى ' + n, true));
+        }
+
+        function updateColsUI(cols) {
+            currentCols = cols;
+            const opt5 = document.getElementById('col-opt-5');
+            const opt7 = document.getElementById('col-opt-7');
+            opt5.style.background = cols === 5 ? '#1E9847' : 'transparent';
+            opt5.style.color      = cols === 5 ? '#111'    : '#555';
+            opt7.style.background = cols === 7 ? '#1E9847' : 'transparent';
+            opt7.style.color      = cols === 7 ? '#111'    : '#555';
+            updateEditColsUI(cols);
+        }
+
+        let editCurrentCols = 5;
+
+        function setEditGameColumns(n) {
+            editCurrentCols = n;
+            updateEditColsUI(n);
+        }
+
+        function updateEditColsUI(cols) {
+            editCurrentCols = cols;
+            const opt5 = document.getElementById('edit-col-opt-5');
+            const opt7 = document.getElementById('edit-col-opt-7');
+            if (!opt5 || !opt7) return;
+            opt5.style.background = cols === 5 ? '#1E9847' : 'transparent';
+            opt5.style.color      = cols === 5 ? '#111'    : '#555';
+            opt7.style.background = cols === 7 ? '#1E9847' : 'transparent';
+            opt7.style.color      = cols === 7 ? '#111'    : '#555';
+        }
+    </script>
+
+<script>
+(function () {
+    function initRipple() {
+        document.querySelectorAll('button').forEach(function (btn) {
+            if (btn.dataset.ripple) return;
+            btn.dataset.ripple = '1';
+            btn.style.position = 'relative';
+            btn.style.overflow = 'hidden';
+            btn.addEventListener('click', function (e) {
+                var r = btn.getBoundingClientRect();
+                var span = document.createElement('span');
+                span.className = 'ripple-effect';
+                var size = Math.max(r.width, r.height);
+                span.style.cssText = 'position:absolute;border-radius:50%;transform:scale(0);animation:rippleAnim 0.55s linear;pointer-events:none;background:rgba(255,255,255,0.28);width:' + size + 'px;height:' + size + 'px;left:' + (e.clientX - r.left - size / 2) + 'px;top:' + (e.clientY - r.top - size / 2) + 'px;';
+                btn.appendChild(span);
+                span.addEventListener('animationend', function () { span.remove(); });
+            });
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        initRipple();
+        var observer = new MutationObserver(function () { initRipple(); });
+        var container = document.getElementById('matches-container');
+        if (container) observer.observe(container, { childList: true, subtree: true });
+    });
+})();
+</script>
+
+</body>
+</html>

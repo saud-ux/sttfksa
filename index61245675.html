@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شاشة العرض</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Inter:wght@400;600;700&display=swap" media="print" onload="this.media='all'">
+    <style>
+    :root {
+        --primary-color:  #028C46;
+        --primary-hover:  #024F25;
+        --bg-dark:        #0d1520;
+        --card-bg:        #111d24;
+        --text-white:     #ffffff;
+        --primary-gold:   #028C46;
+        --bg-black:       #0d1520;
+        --timeout-color:  #028C46;
+        --glass:          rgba(255, 255, 255, 0.06);
+        --transition:     all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: 'Inter', 'Cairo', sans-serif;
+    }
+
+    html { background-color: #0d1520; }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(ellipse at 50% -5%, rgba(2,140,70,0.12) 0%, transparent 52%),
+                repeating-linear-gradient(45deg, transparent, transparent 7px, rgba(2,140,70,0.025) 7px, rgba(2,140,70,0.025) 8px),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Ccircle cx='20' cy='20' r='3' fill='none' stroke='rgba(2,140,70,0.04)' stroke-width='1'/%3E%3Ccircle cx='70' cy='50' r='3' fill='none' stroke='rgba(2,140,70,0.04)' stroke-width='1'/%3E%3Ccircle cx='100' cy='90' r='3' fill='none' stroke='rgba(2,140,70,0.04)' stroke-width='1'/%3E%3C/svg%3E"),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30,4 L56,30 L30,56 L4,30 Z' fill='none' stroke='rgba(2,140,70,0.06)' stroke-width='1.2'/%3E%3Cpath d='M30,17 L43,30 L30,43 L17,30 Z' fill='none' stroke='rgba(2,140,70,0.04)' stroke-width='1'/%3E%3C/svg%3E");
+            background-size: auto, 8px 8px, 120px 120px, 60px 60px;
+            font-family: 'Inter', 'Cairo', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-top: clamp(20px, 6vw, 80px);
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #028C46, transparent);
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .fed-bar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            height: 6px;
+            background: linear-gradient(90deg, #024F25 0%, #028C46 30%, #028C46 45%, #ffffff 50%, #028C46 55%, #028C46 70%, #024F25 100%);
+        }
+
+        .fed-watermark {
+            position: fixed; top: 14px; right: 20px; z-index: 99;
+            opacity: 0.95; pointer-events: none;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .fed-watermark img {
+            height: 85px; width: auto; object-fit: contain;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.8));
+        }
+        .fed-watermark-name {
+            color: #028C46; font-size: 0.75em; font-weight: 700;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.9);
+            line-height: 1.3; max-width: 140px;
+            display: none;
+        }
+        .match-info {
+            width: 100%;
+            max-width: 1600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 0;
+            background: linear-gradient(180deg, rgba(2,79,37,0.55) 0%, rgba(1,40,18,0.35) 60%, transparent 100%);
+            border-top: 3px solid #028C46;
+            border-bottom: 2px solid rgba(255,255,255,0.12);
+            padding: 14px 0 10px;
+            position: relative;
+        }
+   
+
+        .match-info h2 {
+            color: #ffffff;
+            margin: 10px 0 0;
+            font-size: clamp(1.4em, 3.5vw, 2.8em);
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-shadow: 0 0 18px rgba(30,152,71,0.7), 0 2px 6px rgba(0,0,0,0.9);
+            text-align: center;
+            white-space: nowrap;
+        }
+        .sponsors-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(28px, 4vw, 70px);
+            flex-wrap: wrap;
+            width: 100%;
+            padding: 0 24px;
+        }
+        .sponsor-logo-wrap {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: clamp(28px, 4vw, 70px);
+            min-width: 0;
+            justify-content: center;
+            background: transparent;
+        }
+        .sponsor-logo-wrap img { height: clamp(140px, 20vw, 280px); width: auto; max-width: clamp(220px, 32vw, 500px); object-fit: contain; mix-blend-mode: screen; display: none; }
+        .sponsor-name-text { color: #aaa; font-size: clamp(1.3em, 2.8vw, 2.5em); display: none; }
+
+        .main-wrapper {
+            background-color: transparent;
+            display: grid;
+            grid-template-columns: 1fr 1.2fr 1fr;
+            align-items: start;
+            width: 98%;
+            max-width: 1600px;
+            gap: 20px;
+        }
+
+        .score-container {
+            background: linear-gradient(180deg, rgba(16,140,72,0.85) 0%, rgba(5,18,10,0.95) 100%);
+            border-radius: 30px;
+            padding: 30px 20px;
+            border: 2px solid rgba(16,140,72,0.6);
+            box-shadow: 0 0 60px rgba(0,0,0,0.95), 0 0 40px rgba(16,140,72,0.15) inset, inset 0 1px 0 rgba(16,140,72,0.15);
+            text-align: center;
+            position: relative;
+        }
+        .score-container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 10%; right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #108c48, #ffffff, #108c48, transparent);
+            border-radius: 2px;
+        }
+        .score { font-size: clamp(4em, 13vw, 8em); color: white; font-weight: 900; line-height: 0.9; margin: 10px 0; text-shadow: 0 0 30px rgba(2,140,70,0.4); }
+        .match-score { font-size: clamp(2em, 6vw, 4em); color: #ffffff; font-weight: 800; letter-spacing: 5px; margin-bottom: 5px; }
+        .set-score { font-size: clamp(1.2em, 3vw, 2.5em); color: #ccffdd; font-weight: 700; opacity: 0.9; border-top: 1px solid rgba(30,152,71,0.35); padding-top: 10px; margin-top: 10px; }
+        #set-val { color: #c91400; }
+        .team { display: flex; flex-direction: column; align-items: center; position: relative; }
+        .team-logo { width: clamp(100px, 20vw, 220px); height: clamp(80px, 15vw, 180px); object-fit: contain; border-radius: 15px; background: rgba(255,255,255,0.04); padding: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.7), 0 0 0 2px rgba(16,140,72,0.5); }
+        .team-name { font-size: clamp(1.5em, 3.5vw, 3.2em); color: #ffffff; margin-top: 15px; font-weight: 900; letter-spacing: 1px; text-shadow: 0 0 12px rgba(2,140,70,0.5); }
+        .players-display { font-size: clamp(1.2em, 2.2vw, 2.2em); background: linear-gradient(135deg, rgba(16,140,72,0.4), rgba(16,140,72,0.15)); border: 1px solid rgba(16,140,72,0.3); padding: 8px 18px; border-radius: 8px; margin-top: 8px; color: #ccffdd; }
+        .card-container { display: flex; gap: 4px; margin-top: 15px; height: 70px; align-items: center; justify-content: center; direction: ltr; }
+        .card-img { height: 62px; width: auto; visibility: hidden; filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
+        #main-timer-display {
+            font-size: clamp(1rem, 2.5vw, 2.2rem);
+            color: var(--timeout-color);
+            font-weight: bold;
+            height: clamp(36px, 5vh, 60px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .timeout-badge {
+            display: none;
+            position: absolute;
+            top: -32px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+            background: var(--timeout-color);
+            color: #000;
+            font-weight: 900;
+            font-size: clamp(0.65em, 1.3vw, 1.05em);
+            padding: clamp(3px,0.55vw,7px) clamp(10px,1.8vw,18px);
+            border-radius: 50px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+        }
+        .timeout-badge img {
+            height: 1.4em;
+            width: auto;
+            vertical-align: middle;
+        }
+
+
+        .score span { display: inline-block; }
+        .score-sep  { opacity: 0.7; }
+
+        #winner-overlay { display: none; position: fixed; z-index: 2000; inset: 0; background: rgba(0,0,0,0.75); justify-content: center; align-items: center; }
+        #winner-overlay.show { display: flex; }
+        .winner-card { background: linear-gradient(160deg, #1a1200 0%, #111d24 100%); border-radius: 20px; padding: clamp(20px,3vh,40px) clamp(20px,4vw,60px); text-align: center; width: 65vw; max-width: 900px; min-width: 400px; height: auto; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 80px rgba(0,0,0,0.9), 0 0 40px rgba(200,160,0,0.15); border: 3px solid #c8a400; outline: 6px solid rgba(200,160,0,0.18); position: relative; overflow: hidden; }
+        .winner-trophy { font-size: clamp(3em, 7vw, 6em); margin-bottom: 12px; }
+        .winner-label { color: #ffd700; font-size: clamp(1.2em, 2.5vw, 2.5em); letter-spacing: 4px; margin-bottom: 12px; font-weight: 900; text-shadow: 0 0 18px rgba(255,210,0,0.5); }
+        .winner-flag { width: clamp(90px, 12vw, 160px); height: clamp(90px, 12vw, 160px); object-fit: contain; border-radius: 8px; margin: 12px auto; display: block; }
+        .winner-name { color: white; font-size: clamp(1.6em, 3.5vw, 3.5em); font-weight: bold; margin: 12px 0 6px; letter-spacing: 2px; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
+        .winner-score-display { color: #ffd700; font-size: clamp(1.4em, 3vw, 3em); font-weight: bold; margin-bottom: 18px; text-shadow: 0 0 14px rgba(255,210,0,0.5); }
+        .winner-sets-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+        .winner-set-badge { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: clamp(8px,1.2vh,14px) clamp(16px,2.5vw,28px); font-size: clamp(1em, 2.2vw, 2em); color: #ccc; }
+        .winner-set-badge.win { background: rgba(200,160,0,0.22); border-color: #c8a400; color: #ffd700; font-weight: bold; }
+
+        #congrats-overlay { display: none; position: fixed; z-index: 2100; inset: 0; background: rgba(0,0,0,0.75); justify-content: center; align-items: center; }
+        #congrats-overlay.show { display: flex; }
+        .congrats-card { background: linear-gradient(160deg, #024F25 0%, #111d24 100%); border-radius: 20px; padding: clamp(20px,3vh,40px) clamp(20px,4vw,60px); text-align: center; width: 65vw; max-width: 900px; min-width: 400px; height: auto; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 60px rgba(0,0,0,0.8); border: 3px solid var(--primary-gold); outline: 6px solid rgba(2,140,70,0.2); }
+        .congrats-title {color: #ffd700; font-size: clamp(2em, 4vw, 4.5em); letter-spacing: 4px; margin-bottom: 16px; font-weight: 900; }
+        .congrats-logo { width: clamp(90px, 12vw, 160px); height: clamp(90px, 12vw, 160px); object-fit: contain; margin: 12px auto; display: block; }
+        .congrats-won-label { color: #ffd700;  font-size: clamp(1em, 2vw, 2em); font-weight: bold; letter-spacing: 2px; margin-bottom: 14px; }
+        .congrats-sets { display: inline-flex; align-items: center; gap: 14px; background: rgba(30,152,71,0.15); border: 2px solid rgba(30,152,71,0.5); border-radius: 12px; padding: clamp(8px,1.5vh,16px) clamp(20px,3vw,40px); }
+        .congrats-set-win  { font-size: clamp(2em, 5vw, 4em); font-weight: bold; color: var(--primary-gold); }
+        .congrats-set-sep  { font-size: clamp(2em, 4vw, 3.5em); color: #aaa; font-weight: bold; }
+        .congrats-set-lose { font-size: clamp(2em, 5vw, 4em); font-weight: bold; color: #e74c3c; }
+
+        @media (max-width: 900px) {
+            .main-wrapper {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: auto auto;
+            }
+            .score-container {
+                grid-column: 1 / -1;
+                order: -1;
+                padding: 20px 15px;
+            }
+            .team { padding: 10px 5px; }
+            .match-info h2 { white-space: normal; text-align: center; }
+        }
+
+        @media (max-width: 600px) {
+            .main-wrapper {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .score-container { grid-column: 1; padding: 16px 10px; }
+            .team { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 8px; }
+            .team-logo { width: clamp(60px, 18vw, 100px); height: clamp(50px, 14vw, 80px); }
+            .team-name { font-size: clamp(1em, 4vw, 1.8em); margin-top: 6px; }
+            .players-display { font-size: clamp(0.85em, 3vw, 1.2em); padding: 5px 10px; }
+            .score { font-size: clamp(2.5em, 12vw, 5em); }
+            .match-score { font-size: clamp(1.4em, 5vw, 2.5em); }
+            .set-score { font-size: clamp(0.9em, 3vw, 1.6em); }
+            .sponsors-row { gap: clamp(10px, 3vw, 40px); }
+            .card-img { height: 44px; }
+            .match-info { margin-bottom: 10px; }
+            .winner-card, .congrats-card { width: 90vw; min-width: unset; padding: 16px; }
+        }
+
+        .page-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+    
+    @keyframes topBarShimmer {
+      0%   { opacity: 0; }
+      40%  { opacity: 1; filter: brightness(2.2); }
+      100% { opacity: 1; filter: brightness(1); }
+    }
+    body::before { animation: topBarShimmer 1.5s ease-out 1 forwards; }
+
+    @keyframes scoreFlash {
+      0%   { transform: scale(1);    color: white;   text-shadow: none; }
+      20%  { transform: scale(1.35); color: #02ff7a; text-shadow: 0 0 40px rgba(2,255,122,0.9), 0 0 80px rgba(2,140,70,0.6); }
+      55%  { transform: scale(1.12); color: #ccffdd; text-shadow: 0 0 20px rgba(2,140,70,0.5); }
+      100% { transform: scale(1);    color: white;   text-shadow: none; }
+    }
+    .score-flash { animation: scoreFlash 0.7s cubic-bezier(0.25,0.46,0.45,0.94) forwards; }
+
+    @keyframes setWonFlash {
+      0%   { transform: scale(1);   filter: none; }
+      15%  { transform: scale(1.6); filter: drop-shadow(0 0 30px #028C46) brightness(2); }
+      45%  { transform: scale(1.2); filter: drop-shadow(0 0 15px #028C46) brightness(1.4); }
+      100% { transform: scale(1);   filter: none; }
+    }
+    .set-won-flash { animation: setWonFlash 0.9s ease-out forwards; }
+
+    .timeout-badge.timeout-visible {
+      display: flex !important;
+      animation: timeoutIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275) forwards;
+    }
+    @keyframes timeoutIn {
+      from { transform: translateX(-50%) scale(0.4); opacity: 0; }
+      to   { transform: translateX(-50%) scale(1);   opacity: 1; }
+    }
+
+    @keyframes serveBounce {
+      0%   { transform: scale(0.2) rotate(-12deg); }
+      55%  { transform: scale(1.25) rotate(6deg);  }
+      80%  { transform: scale(0.92) rotate(-3deg); }
+      100% { transform: scale(1)    rotate(0deg);  }
+    }
+    .serve-bounce { animation: serveBounce 0.45s cubic-bezier(0.175,0.885,0.32,1.275) forwards; }
+
+    @keyframes cardEntrance {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes popIn { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    #winner-overlay.show .winner-card   { animation: popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards; }
+    #congrats-overlay.show .congrats-card { animation: popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards; }
+    .winner-card::after {
+      content: ''; position: absolute; inset: 0; border-radius: 20px;
+      background: radial-gradient(ellipse at 50% 50%, rgba(200,160,0,0.18) 0%, transparent 70%);
+      animation: winnerGlow 2s ease-in-out infinite; pointer-events: none;
+    }
+    @keyframes winnerGlow { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+    button:active, .btn-action:active {
+      transform: scale(0.96) !important; transition: transform 0.1s !important;
+    }
+    input:focus, select:focus, textarea:focus {
+      box-shadow: 0 0 0 3px rgba(2,140,70,0.25) !important;
+    }
+    .ripple-effect {
+      position: absolute; border-radius: 50%; background: rgba(255,255,255,0.25);
+      transform: scale(0); animation: rippleAnim 0.5s linear forwards;
+      pointer-events: none; z-index: 10;
+    }
+    @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+    #timeout-announce-overlay {
+        display: none; position: fixed; z-index: 2500; inset: 0;
+        background: rgba(0,0,0,0.8);
+        justify-content: center; align-items: center;
+        backdrop-filter: blur(3px);
+    }
+    #timeout-announce-overlay.show { display: flex; animation: overlayFadeIn 0.2s ease-out; }
+    .timeout-announce-box {
+        display: flex; flex-direction: column; align-items: center;
+        gap: clamp(10px,1.5vw,22px);
+        background: linear-gradient(160deg, rgba(2,60,30,0.97) 0%, rgba(5,18,10,0.99) 100%);
+        border: 3px solid #028C46;
+        border-radius: 22px;
+        padding: clamp(22px,3vw,55px) clamp(32px,5vw,90px);
+        box-shadow: 0 0 60px rgba(2,140,70,0.45), inset 0 1px 0 rgba(2,140,70,0.2);
+    }
+    @keyframes timeoutAnnounceBounce {
+        0%   { transform: scale(0.3) translateY(-60px); opacity: 0; }
+        60%  { transform: scale(1.08) translateY(0);    opacity: 1; }
+        100% { transform: scale(1)   translateY(0);     opacity: 1; }
+    }
+    #timeout-announce-overlay.show .timeout-announce-box {
+        animation: timeoutAnnounceBounce 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards;
+    }
+    .timeout-announce-icon  { font-size: clamp(2.5em,5vw,5em); }
+    .timeout-announce-label {
+        color: #028C46; font-size: clamp(1.4em,3vw,2.8em); font-weight: 900;
+        letter-spacing: 5px; text-shadow: 0 0 20px rgba(2,140,70,0.7);
+    }
+    .timeout-announce-team  {
+        color: #ffffff; font-size: clamp(1.3em,2.8vw,2.8em); font-weight: 900;
+        letter-spacing: 2px; text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    }
+    .timeout-announce-logo  {
+        height: clamp(120px,18vw,240px); width: auto; object-fit: contain;
+        border-radius: 10px; background: rgba(255,255,255,0.05); padding: 4px;
+    }
+
+    #card-announce-overlay {
+        display: none; position: fixed; z-index: 3000; inset: 0;
+        background: rgba(0,0,0,0.88);
+        justify-content: center; align-items: center;
+        backdrop-filter: blur(4px);
+    }
+    #card-announce-overlay.show { display: flex; }
+    @keyframes overlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    #card-announce-overlay.show { animation: overlayFadeIn 0.25s ease-out; }
+
+    .card-announce-box {
+        display: flex; flex-direction: column; align-items: center; gap: clamp(12px,2vw,24px);
+    }
+    @keyframes cardAnnounceDrop {
+        0%   { transform: scale(0.1) translateY(-120px) rotate(-15deg); opacity: 0; }
+        55%  { transform: scale(1.15) translateY(0)      rotate(4deg);  opacity: 1; }
+        75%  { transform: scale(0.95)                    rotate(-2deg); }
+        100% { transform: scale(1)                       rotate(0deg);  opacity: 1; }
+    }
+    #card-announce-overlay.show .card-announce-box {
+        animation: cardAnnounceDrop 0.65s cubic-bezier(0.175,0.885,0.32,1.275) forwards;
+    }
+    .card-announce-label {
+        color: #ffdd00;
+        font-size: clamp(1.6em, 3.5vw, 3em);
+        font-weight: 900;
+        letter-spacing: 5px;
+        text-shadow: 0 0 25px rgba(255,210,0,0.9), 0 2px 6px rgba(0,0,0,0.9);
+        text-align: center;
+    }
+    #card-announce-img {
+        height: clamp(220px, 38vw, 480px);
+        width: auto;
+        filter: drop-shadow(0 0 50px rgba(255,200,0,0.8)) drop-shadow(0 0 100px rgba(255,80,0,0.4));
+    }
+    .card-announce-player {
+        color: #ffffff;
+        font-size: clamp(1.5em, 3.5vw, 3.2em);
+        font-weight: 900;
+        letter-spacing: 3px;
+        text-shadow: 0 0 18px rgba(255,255,255,0.6), 0 2px 6px rgba(0,0,0,0.9);
+        text-align: center;
+    }
+    .card-announce-team {
+        color: rgba(255,255,255,0.65);
+        font-size: clamp(1em, 2vw, 1.8em);
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-align: center;
+    }
+
+    #score-timer-img {
+        height: clamp(36px,5vw,64px); width: auto; object-fit: contain;
+        display: none;
+        filter: drop-shadow(0 0 8px rgba(2,200,100,0.5));
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    /* ── Series stats overlay ── */
+    #series-stats-overlay {
+        display: none; position: fixed; z-index: 4500; inset: 0;
+        background: rgba(0,0,0,0.93);
+        justify-content: center; align-items: center;
+        overflow-y: auto; padding: 24px 12px;
+    }
+    #series-stats-overlay.show { display: flex; }
+    .series-stats-card {
+        background: linear-gradient(160deg, #024F25 0%, #111d24 100%);
+        border: 3px solid #028C46;
+        outline: 6px solid rgba(2,140,70,0.15);
+        border-radius: 18px;
+        padding: 40px 44px 34px;
+        max-width: min(960px, 94vw); width: 100%;
+        box-shadow: 0 0 70px rgba(0,0,0,0.95), 0 0 40px rgba(2,140,70,0.1) inset;
+        animation: popIn 0.4s cubic-bezier(.175,.885,.32,1.275);
+        font-family: 'Cairo', 'Inter', sans-serif;
+        direction: ltr;
+    }
+    .stats-title {
+        color: #ffffff; font-size: clamp(2.2em,5.5vw,3.4em);
+        font-weight: 900; text-align: center; letter-spacing: 3px;
+        text-transform: uppercase; margin-bottom: 4px;
+    }
+    .stats-title-line {
+        height: 2px; margin: 6px auto 14px;
+        background: linear-gradient(90deg, transparent, #028C46, transparent);
+        width: 60%;
+    }
+    .stats-teams-header {
+        display: flex; align-items: stretch; gap: 0;
+        background: linear-gradient(135deg, #061a0e 0%, #0a2414 40%, #061a0e 100%);
+        border: 2px solid #028C46; border-radius: 16px; margin-bottom: 18px;
+        overflow: hidden;
+        box-shadow: 0 0 40px rgba(2,140,70,0.2) inset, 0 4px 24px rgba(0,0,0,0.7);
+        position: relative;
+    }
+    .stats-teams-header::before {
+        content: ''; position: absolute; inset: 0;
+        background: radial-gradient(ellipse at 50% 50%, rgba(2,140,70,0.08) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .sth-side {
+        flex: 1; display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        padding: clamp(14px,2vw,24px) clamp(10px,1.5vw,20px);
+        gap: 10px; min-width: 0;
+    }
+    .sth-logo { width: clamp(70px,10vw,110px); height: clamp(70px,10vw,110px); object-fit: contain; flex-shrink: 0; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.8)); }
+    .sth-name { color: #ffffff; font-size: clamp(1.1em,2.5vw,1.8em); font-weight: 900; letter-spacing: 2px; text-transform: uppercase; text-align: center; text-shadow: 0 2px 8px rgba(0,0,0,0.8); word-break: break-word; line-height: 1.2; }
+    .sth-score-center {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        padding: clamp(14px,2vw,24px) clamp(16px,2.5vw,32px); flex-shrink: 0;
+        border-left: 1px solid rgba(2,140,70,0.35); border-right: 1px solid rgba(2,140,70,0.35);
+        background: linear-gradient(180deg, rgba(2,140,70,0.18) 0%, rgba(2,50,25,0.3) 100%);
+        gap: 6px; min-width: clamp(110px,16vw,180px);
+    }
+    .sth-score-label { color: #028C46; font-size: clamp(0.65em,1.2vw,0.9em); font-weight: 700; letter-spacing: 4px; text-transform: uppercase; opacity: 0.9; }
+    .sth-score-digits { color: #ffffff; font-size: clamp(2.6em,6vw,4.2em); font-weight: 900; letter-spacing: 6px; text-shadow: 0 0 30px rgba(2,200,100,0.5), 0 2px 8px rgba(0,0,0,0.9); line-height: 1; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .sth-score-digits .sth-score-num { display: inline-block; min-width: 1.1ch; text-align: center; }
+    .sth-score-digits .sth-score-sep { color: rgba(255,255,255,0.3); font-weight: 400; font-size: 0.7em; vertical-align: middle; letter-spacing: 0; margin: 0 4px; }
+    .sth-score-bar { display: flex; gap: 4px; margin-top: 4px; }
+    .sth-score-pip { width: clamp(10px,1.5vw,16px); height: clamp(10px,1.5vw,16px); border-radius: 50%; background: rgba(2,140,70,0.25); border: 1px solid rgba(2,140,70,0.4); }
+    .sth-score-pip.lit { background: #028C46; box-shadow: 0 0 8px rgba(2,200,100,0.7); }
+    .stats-match-row { display: flex; align-items: center; gap: 8px; background: rgba(2,140,70,0.08); border: 1px solid rgba(2,140,70,0.2); border-radius: 8px; padding: 8px 12px; margin-bottom: 10px; }
+    .stats-player-photo { width: clamp(70px,11vw,100px); height: clamp(70px,11vw,100px); object-fit: cover; border-radius: 6px; flex-shrink: 0; }
+    .stats-player-info { flex: 1; min-width: 0; }
+    .stats-player-firstname { color: #ffffff; font-size: clamp(1.45em,3.2vw,1.8em); font-weight: 900; text-transform: uppercase; line-height: 1.2; word-break: break-word; }
+    .stats-player-lastname { color: rgba(255,255,255,0.6); font-size: 1.05em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.2; word-break: break-word; margin-top: 4px; }
+    .stats-player-info.right { text-align: right; }
+    .stats-match-center-col { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; min-width: clamp(90px,18vw,130px); }
+    .stats-match-label-badge { background: #028C46; color: #fff; font-size: 1.15em; font-weight: 900; padding: 5px 16px; border-radius: 4px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; font-family: 'Cairo','Inter',sans-serif; }
+    .stats-match-score-box { background: #024F25; color: #ffffff; border: 1px solid rgba(2,140,70,0.5); font-size: clamp(1.6rem,3vw,2.4rem); font-weight: 900; padding: 6px 16px; border-radius: 5px; letter-spacing: 4px; }
+    .stats-close-btn {
+        display: block; margin: 18px auto 0;
+        background: rgba(2,140,70,0.15); color: #fff; border: 1px solid rgba(2,140,70,0.4);
+        padding: 10px 36px; border-radius: 8px; cursor: pointer;
+        font-size: 0.9em; font-weight: bold; font-family: 'Cairo','Inter',sans-serif;
+        transition: background 0.2s;
+    }
+    .stats-close-btn:hover { background: rgba(2,140,70,0.3); }
+    </style>
+</head>
+<body>
+
+  <main class="page-main">
+    <div class="fed-bar"></div>
+    <div class="fed-watermark">
+        <img id="fed-logo" src="logo1.png" alt="">
+        <span class="fed-watermark-name federation-name"></span>
+    </div>
+
+    <div class="match-info">
+        <div class="sponsors-row">
+            <div class="sponsor-logo-wrap">
+                <img id="sponsor-logo-left" src="" alt="sponsor" style="display:block;">
+                <span id="sponsor-name-left" class="sponsor-name-text"></span>
+            </div>
+            <div class="sponsor-logo-wrap">
+                <img id="sponsor-logo-right" src="" alt="sponsor" style="display:block;">
+                <span id="sponsor-name-right" class="sponsor-name-text"></span>
+            </div>
+        </div>
+    </div>
+    <h2 id="match-name" style="margin-top:32px; color:#ffffff; font-size:clamp(1.4em,3.5vw,2.8em); font-weight:900; letter-spacing:2px; text-shadow:0 0 18px rgba(30,152,71,0.7),0 2px 6px rgba(0,0,0,0.9); text-align:center; white-space:nowrap;">--</h2>
+
+    <div class="main-wrapper">
+        <div class="team">
+            <div id="timeout-L" class="timeout-badge">وقت مستقطع</div>
+            <img src="" class="team-logo" id="left-team-logo">
+            <span class="team-name" id="left-team-name">--</span>
+            <div id="match-score-left" style="font-size: clamp(2em, 5vw, 4em); font-weight: 900; color: var(--primary-gold);">0</div>
+            <div style="display:flex; align-items:center; justify-content:center; position:relative;">
+                <img id="serve-right" src="racket.png" alt="serve"
+                     style="position:absolute; right:calc(100% + 8px); height:clamp(44px,6vw,72px); width:auto; opacity:0; transition:opacity 0.3s ease;">
+                <div class="players-display"><span id="name-l-p2">-</span></div>
+            </div>
+            <div class="card-container" id="left-cards">
+                <img src="white-card.png" class="card-img" id="left-white">
+                <img src="Yellow_card.svg.png" class="card-img" id="left-card">
+                <img src="Yellow-red card 1.png" class="card-img" id="left-yr1">
+                <img src="Yellow-red card 2.png" class="card-img" id="left-yr2">
+            </div>
+        </div>
+
+        <div class="score-container">
+            <div id="main-timer-display" style="display:flex;align-items:center;justify-content:center;gap:8px;">
+                <img id="score-timer-img" src="timer.png" alt="">
+                <span id="main-timer-text"></span>
+            </div>
+            <div class="score" id="game-score"><span id="gs-l">0</span><span class="score-sep"> - </span><span id="gs-r">0</span></div>
+            <div class="set-score">
+                <span id="set-val">0 - 0</span>
+            </div>
+        </div>
+
+        <div class="team">
+            <div id="timeout-R" class="timeout-badge">وقت مستقطع</div>
+            <img src="" class="team-logo" id="right-team-logo">
+            <span class="team-name" id="right-team-name">--</span>
+            <div id="match-score-right" style="font-size: clamp(2em, 5vw, 4em); font-weight: 900; color: var(--primary-gold);">0</div>
+            <div style="display:flex; align-items:center; justify-content:center; position:relative;">
+                <div class="players-display"><span id="name-r-p2">-</span></div>
+                <img id="serve-left" src="racket.png" alt="serve"
+                     style="position:absolute; left:calc(100% + 8px); height:clamp(44px,6vw,72px); width:auto; opacity:0; transition:opacity 0.3s ease;">
+            </div>
+            <div class="card-container" id="right-cards">
+                <img src="white-card.png" class="card-img" id="right-white">
+                <img src="Yellow_card.svg.png" class="card-img" id="right-card">
+                <img src="Yellow-red card 1.png" class="card-img" id="right-yr1">
+                <img src="Yellow-red card 2.png" class="card-img" id="right-yr2">
+            </div>
+        </div>
+    </div>
+
+
+  </main>
+
+  
+
+    <div id="timeout-announce-overlay">
+        <div class="timeout-announce-box">
+            <div class="timeout-announce-label">وقت مستقطع</div>
+            <img id="timeout-announce-logo" class="timeout-announce-logo" src="" alt="" onerror="this.style.display='none'">
+            <div class="timeout-announce-team" id="timeout-announce-team"></div>
+        </div>
+    </div>
+
+    <div id="card-announce-overlay">
+        <div class="card-announce-box">
+            <div class="card-announce-label" id="card-announce-label">كرت أصفر</div>
+            <img id="card-announce-img" src="" alt="card">
+            <div class="card-announce-player" id="card-announce-player"></div>
+            <div class="card-announce-team" id="card-announce-team"></div>
+        </div>
+    </div>
+
+    <div id="winner-overlay">
+        <div class="winner-card">
+            <div class="winner-label">الفائز بالمباراة</div>
+            <img id="winner-flag" class="winner-flag" src="" alt="" onerror="this.style.display='none'">
+            <div id="winner-name" class="winner-name">-</div>
+            <div id="winner-score-display" class="winner-score-display">0 - 0</div>
+            <div id="winner-sets-row" class="winner-sets-row"></div>
+        </div>
+    </div>
+
+    <div id="congrats-overlay">
+        <div class="congrats-card">
+            <div class="congrats-title">مبروك الفوز </div>
+            <img id="congrats-flag" class="congrats-logo" src="" alt="" onerror="this.style.display='none'">
+            <div id="congrats-team-name" style="color:var(--primary-gold); font-size:clamp(1.2em,2.5vw,2em); font-weight:bold; margin: 6px 0 10px; letter-spacing:1px;"></div>
+            <div class="congrats-won-label">الفائز بالمباراة</div>
+            <div class="congrats-sets">
+                <span id="congrats-win-sets"  class="congrats-set-win">0</span>
+                <span class="congrats-set-sep">-</span>
+                <span id="congrats-lose-sets" class="congrats-set-lose">0</span>
+            </div>
+        </div>
+    </div>
+    <div id="series-stats-overlay">
+        <div class="series-stats-card">
+            <div class="stats-title">ملخص المباراة</div>
+            <div class="stats-title-line"></div>
+            <div class="stats-teams-header" id="stats-teams-header"></div>
+            <div id="stats-matches-list"></div>
+        </div>
+    </div>
+
+<!-- Copyright (c) 2026 Saud Alhamad. All rights reserved. Licensed to STTF. -->
+
+      <script src="config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+        const firebaseConfig = APP_CONFIG.firebase;
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        function updateServe(serve) {
+            const sL = document.getElementById('serve-left');
+            const sR = document.getElementById('serve-right');
+            const showL = serve === 'left';
+            const showR = serve === 'right';
+
+            if (showR && sR.style.opacity !== '1') {
+                sR.classList.remove('serve-bounce');
+                void sR.offsetWidth;
+                sR.classList.add('serve-bounce');
+            }
+            if (showL && sL.style.opacity !== '1') {
+                sL.classList.remove('serve-bounce');
+                void sL.offsetWidth;
+                sL.classList.add('serve-bounce');
+            }
+
+            sL.style.opacity = showL ? '1' : '0';
+            sR.style.opacity = showR ? '1' : '0';
+        }
+
+        let _lastMatchId = null, _matchListener = null;
+        let _prevGsL = null, _prevGsR = null, _prevMsL = null, _prevMsR = null, _prevServeAnim = null;
+        let _prevCards = {};
+        let _prevTimeouts = {};
+        let _prevTeamLeftName = null;
+        let currentMatchData = null;
+
+        function announceTimeout(side, teams) {
+            var overlay = document.getElementById('timeout-announce-overlay');
+            var teamEl  = document.getElementById('timeout-announce-team');
+            var logoEl  = document.getElementById('timeout-announce-logo');
+            var name  = (teams && teams[side]) ? (teams[side].name || '') : '';
+            var logo  = (teams && teams[side]) ? (teams[side].logo || '') : '';
+            teamEl.textContent = name;
+            logoEl.src = logo;
+            logoEl.style.display = logo ? 'block' : 'none';
+            var box = overlay.querySelector('.timeout-announce-box');
+            if (box) { box.style.animation = 'none'; }
+            overlay.classList.remove('show');
+            void overlay.offsetWidth;
+            if (box) { box.style.animation = ''; }
+            overlay.classList.add('show');
+            clearTimeout(overlay._hideTimer);
+            overlay._hideTimer = setTimeout(function () { overlay.classList.remove('show'); }, 1800);
+        }
+
+        function announceCard(imgSrc, side, teams) {
+            var overlay  = document.getElementById('card-announce-overlay');
+            var img      = document.getElementById('card-announce-img');
+            var labelEl  = document.getElementById('card-announce-label');
+            var playerEl = document.getElementById('card-announce-player');
+            var teamEl   = document.getElementById('card-announce-team');
+
+            var isYellow = imgSrc.indexOf('Yellow_card') >= 0;
+            var isYR1    = imgSrc.indexOf('card 1') >= 0;
+            labelEl.textContent = isYellow ? 'كرت أصفر' : (isYR1 ? 'كرت أصفر/أحمر ١' : 'كرت أصفر/أحمر ٢');
+
+            var name = (teams && teams[side]) ? (teams[side].p1 || teams[side].name || '') : '';
+            var tname = (teams && teams[side]) ? (teams[side].name || '') : '';
+            playerEl.textContent = name;
+            teamEl.textContent   = tname;
+            img.src = imgSrc;
+
+            overlay.classList.remove('show');
+            var box = overlay.querySelector('.card-announce-box');
+            if (box) { box.style.animation = 'none'; }
+            void overlay.offsetWidth;
+            if (box) { box.style.animation = ''; }
+            overlay.classList.add('show');
+
+            clearTimeout(overlay._hideTimer);
+            overlay._hideTimer = setTimeout(function () { overlay.classList.remove('show'); }, 1800);
+        }
+
+        function flashScore(el) {
+            el.classList.remove('score-flash');
+            void el.offsetWidth;
+            el.classList.add('score-flash');
+        }
+        function flashSetWon(el) {
+            el.classList.remove('set-won-flash');
+            void el.offsetWidth;
+            el.classList.add('set-won-flash');
+        }
+
+        function loadActiveMatch() {
+    database.ref('activeMatch').on('value', snapshot => {
+        const matchId = snapshot.val();
+
+     
+        if (matchId === _lastMatchId) return;
+        if (_lastMatchId) {
+            database.ref(`matches/${_lastMatchId}`).off('value', _matchListener);
+            _matchListener = null;
+        }
+        _lastMatchId = matchId;
+        if (!matchId) return;
+
+        _matchListener = (mSnap) => {
+                const data = mSnap.val();
+                if (data) {
+                    currentMatchData = data;
+                    document.getElementById('match-name').textContent = data.name || 'مباراة مباشرة';
+                    const newGS = data.gameScore || "0 - 0";
+                    const gsParts = newGS.split(" - ");
+                    const elGsL = document.getElementById('gs-l');
+                    const elGsR = document.getElementById('gs-r');
+                    if (elGsL && elGsR) {
+                        const newL = gsParts[0] || "0", newR = gsParts[1] || "0";
+                        if (_prevGsL !== null && newL !== _prevGsL) flashScore(elGsL);
+                        if (_prevGsR !== null && newR !== _prevGsR) flashScore(elGsR);
+                        elGsL.textContent = newL; elGsR.textContent = newR;
+                        _prevGsL = newL; _prevGsR = newR;
+                    }
+                    const ms = (data.matchScore || "0 - 0").split(" - ");
+                    const elMsL = document.getElementById('match-score-left');
+                    const elMsR = document.getElementById('match-score-right');
+                    const newMsL = ms[0] || "0", newMsR = ms[1] || "0";
+                    if (_prevMsL !== null && newMsL !== _prevMsL) flashSetWon(elMsL);
+                    if (_prevMsR !== null && newMsR !== _prevMsR) flashSetWon(elMsR);
+                    elMsL.textContent = newMsL; elMsR.textContent = newMsR;
+                    _prevMsL = newMsL; _prevMsR = newMsR;
+                    document.getElementById('set-val').textContent = data.setScore || "0 - 0";
+
+                    const timeouts = data.timeout || {};
+                    if (Object.keys(_prevTimeouts).length > 0) {
+                        ['left', 'right'].forEach(function (s) {
+                            if (!_prevTimeouts[s] && timeouts[s]) announceTimeout(s, data.teams);
+                        });
+                    }
+                    _prevTimeouts = Object.assign({}, timeouts);
+                    document.getElementById('timeout-L').classList.toggle('timeout-visible', !!timeouts.left);
+                    document.getElementById('timeout-R').classList.toggle('timeout-visible', !!timeouts.right);
+
+if (data.teams) {
+    document.getElementById('left-team-name').textContent = data.teams.left.name || "--";
+    document.getElementById('left-team-logo').src = data.teams.left.logo || "";
+
+    const leftPlayer = document.getElementById('name-l-p2');
+    if (leftPlayer) {
+        leftPlayer.textContent = data.teams.left.p1 || "-";
+    }
+
+    document.getElementById('right-team-name').textContent = data.teams.right.name || "--";
+    document.getElementById('right-team-logo').src = data.teams.right.logo || "";
+
+    const rightPlayer = document.getElementById('name-r-p2');
+    if (rightPlayer) {
+        rightPlayer.textContent = data.teams.right.p1 || "-";
+    }
+}
+                    const cards = data.cards || {};
+                    const curLeftName = (data.teams && data.teams.left) ? (data.teams.left.name || '') : '';
+                    const teamsJustSwitched = _prevTeamLeftName !== null && _prevTeamLeftName !== curLeftName;
+                    _prevTeamLeftName = curLeftName;
+
+                    if (!teamsJustSwitched && Object.keys(_prevCards).length > 0) {
+                        var _cardDefs = [
+                            { key: 'leftCard',  img: 'Yellow_card.svg.png',   side: 'left'  },
+                            { key: 'leftYR1',   img: 'Yellow-red card 1.png', side: 'left'  },
+                            { key: 'leftYR2',   img: 'Yellow-red card 2.png', side: 'left'  },
+                            { key: 'rightCard', img: 'Yellow_card.svg.png',   side: 'right' },
+                            { key: 'rightYR1',  img: 'Yellow-red card 1.png', side: 'right' },
+                            { key: 'rightYR2',  img: 'Yellow-red card 2.png', side: 'right' },
+                        ];
+                        _cardDefs.forEach(function (def) {
+                            if (!_prevCards[def.key] && cards[def.key]) {
+                                announceCard(def.img, def.side, data.teams);
+                            }
+                        });
+                    }
+                    _prevCards = Object.assign({}, cards);
+                    ['left', 'right'].forEach(side => {
+                        document.getElementById(`${side}-card`).style.visibility = cards[`${side}Card`] ? 'visible' : 'hidden';
+                        document.getElementById(`${side}-yr1`).style.visibility = cards[`${side}YR1`] ? 'visible' : 'hidden';
+                        document.getElementById(`${side}-yr2`).style.visibility = cards[`${side}YR2`] ? 'visible' : 'hidden';
+                        document.getElementById(`${side}-white`).style.visibility = cards[`${side}White`] ? 'visible' : 'hidden';
+                    });
+
+                    const sponsors = data.sponsors || (data.sponsor ? [data.sponsor] : []);
+                    const leftWrap = document.getElementById('sponsor-logo-left').parentElement;
+                    const rightWrap = document.getElementById('sponsor-logo-right').parentElement;
+                    leftWrap.querySelectorAll('.dynamic-sponsor').forEach(el => el.remove());
+                    rightWrap.querySelectorAll('.dynamic-sponsor').forEach(el => el.remove());
+                    document.getElementById('sponsor-logo-left').style.display = 'none';
+                    document.getElementById('sponsor-name-left').style.display = 'none';
+                    document.getElementById('sponsor-logo-right').style.display = 'none';
+                    document.getElementById('sponsor-name-right').style.display = 'none';
+                    leftWrap.style.display  = sponsors.length > 0 ? 'flex' : 'none';
+                    rightWrap.style.display = 'none';
+                    sponsors.forEach((sp) => {
+                        if (sp.logo) {
+                            const img = document.createElement('img');
+                            img.src = sp.logo;
+                            img.className = 'dynamic-sponsor';
+                            img.style.cssText = 'height:clamp(60px,10vw,140px); width:auto; max-width:clamp(100px,20vw,280px); object-fit:contain; mix-blend-mode:screen; display:block;';
+                            img.onerror = function(){ this.style.display='none'; };
+                            leftWrap.appendChild(img);
+                        } else if (sp.name) {
+                            const txt = document.createElement('span');
+                            txt.textContent = sp.name;
+                            txt.className = 'dynamic-sponsor sponsor-name-text';
+                            txt.style.display = 'block';
+                            leftWrap.appendChild(txt);
+                        }
+                    });
+
+                    updateServe(data.serve || 'center');
+                }
+        };
+        database.ref(`matches/${matchId}`).on('value', _matchListener);
+    });
+}
+
+        database.ref('match/timers').on('value', snap => {
+            const t = snap.val() || {};
+            const textEl = document.getElementById('main-timer-text');
+            const imgEl  = document.getElementById('score-timer-img');
+            if (t.interval) {
+                textEl.textContent = 'بين الاشواط: ' + t.interval;
+            } else if (t.timeout) {
+                textEl.textContent = 'وقت مستقطع: ' + t.timeout;
+            } else if (t.practice) {
+                textEl.textContent = 'تمرين: ' + t.practice;
+            } else {
+                textEl.textContent = '';
+            }
+            imgEl.style.display = (t.interval || t.timeout || t.practice) ? 'block' : 'none';
+        });
+
+        database.ref('showWinner').on('value', snap => {
+            const d = snap.val();
+            if (!d) { document.getElementById('winner-overlay').classList.remove('show'); return; }
+
+            const flagEl = document.getElementById('winner-flag');
+            if (d.logo) { flagEl.src = d.logo; flagEl.style.display = 'block'; }
+            else { flagEl.style.display = 'none'; }
+
+
+
+            document.getElementById('winner-name').textContent = d.winnerName || '-';
+            document.getElementById('winner-score-display').textContent = (d.wSet || '0') + ' - ' + (d.lSet || '0');
+
+            let badgesHTML = '';
+            (d.history || []).forEach((h, i) => {
+                const wG = d.winnerSide === 'left' ? h.l : h.r;
+                const lG = d.winnerSide === 'left' ? h.r : h.l;
+                badgesHTML += `<span class="winner-set-badge ${wG > lG ? 'win' : ''}"><span style="color:#e74c3c; font-weight:bold;">${i+1}</span>: ${wG}-${lG}</span>`;
+            });
+            document.getElementById('winner-sets-row').innerHTML = badgesHTML;
+            document.getElementById('winner-overlay').classList.add('show');
+        });
+
+        database.ref('showCongrats').on('value', snap => {
+            const d = snap.val();
+            if (!d) { document.getElementById('congrats-overlay').classList.remove('show'); return; }
+            const flagEl = document.getElementById('congrats-flag');
+            if (d.logo) { flagEl.src = d.logo; flagEl.style.display = 'block'; }
+            else { flagEl.style.display = 'none'; }
+            document.getElementById('congrats-team-name').textContent = d.teamName || '';
+            document.getElementById('congrats-win-sets').textContent  = d.wSet || '0';
+            document.getElementById('congrats-lose-sets').textContent = d.lSet || '0';
+            document.getElementById('congrats-overlay').classList.add('show');
+        });
+
+        function closeWinner() {
+            database.ref('showWinner').remove();
+            document.getElementById('winner-overlay').classList.remove('show');
+        }
+
+        function closeSeriesStats() {
+            document.getElementById('series-stats-overlay').classList.remove('show');
+            database.ref('showSeriesStats').remove();
+        }
+
+        database.ref('showSeriesStats').on('value', async snap => {
+            const d = snap.val();
+            if (!d) {
+                document.getElementById('series-stats-overlay').classList.remove('show');
+                return;
+            }
+            try {
+                const [seriesSnap, allMatchesSnap] = await Promise.all([
+                    database.ref(`series/${d.seriesId}`).once('value'),
+                    database.ref('matches').once('value')
+                ]);
+                const seriesData = seriesSnap.val();
+                const allMatches = allMatchesSnap.val() || {};
+                if (!seriesData || !Array.isArray(seriesData.matchIds)) return;
+
+                const matches = seriesData.matchIds
+                    .map(id => ({ id, ...(allMatches[id] || {}) }))
+                    .filter(m => m.name);
+
+                const [leftWins, rightWins] = ((currentMatchData && currentMatchData.matchScore) || '0 - 0')
+                    .split(' - ').map(n => parseInt(n) || 0);
+
+                const ref = matches.find(m => m.teams) || matches[0];
+                const lt = (ref && ref.teams && ref.teams.left)  || {};
+                const rt = (ref && ref.teams && ref.teams.right) || {};
+
+                const winsNeeded = seriesData.winsNeeded
+                    ? seriesData.winsNeeded
+                    : seriesData.bestOf
+                        ? Math.ceil(seriesData.bestOf / 2)
+                        : Math.max(leftWins, rightWins, 1);
+                let pipsHTML = '', pipsHTMLR = '';
+                for (let p = 0; p < winsNeeded; p++) {
+                    pipsHTML  += `<span class="sth-score-pip${p < leftWins  ? ' lit' : ''}"></span>`;
+                    pipsHTMLR += `<span class="sth-score-pip${p < rightWins ? ' lit' : ''}"></span>`;
+                }
+                document.getElementById('stats-teams-header').innerHTML = `
+                    <div class="sth-side">
+                        ${lt.logo ? `<img src="${lt.logo}" class="sth-logo" onerror="this.style.display='none'">` : ''}
+                        <span class="sth-name">${(lt.name || lt.p1 || '—').toUpperCase()}</span>
+                        <div class="sth-score-bar">${pipsHTML}</div>
+                    </div>
+                    <div class="sth-score-center">
+                        <div class="sth-score-label">النتيجة</div>
+                        <div class="sth-score-digits">
+                            <span class="sth-score-num">${leftWins}</span>
+                            <span class="sth-score-sep">—</span>
+                            <span class="sth-score-num">${rightWins}</span>
+                        </div>
+                    </div>
+                    <div class="sth-side">
+                        ${rt.logo ? `<img src="${rt.logo}" class="sth-logo" onerror="this.style.display='none'">` : ''}
+                        <span class="sth-name">${(rt.name || rt.p1 || '—').toUpperCase()}</span>
+                        <div class="sth-score-bar">${pipsHTMLR}</div>
+                    </div>
+                `;
+
+                const list = document.getElementById('stats-matches-list');
+                list.innerHTML = '';
+                matches.forEach((m, i) => {
+                    const mlt = (m.teams && m.teams.left)  || {};
+                    const mrt = (m.teams && m.teams.right) || {};
+                    const [sl, sr] = (m.setScore || '0 - 0').split(' - ');
+                    const lFull = (mlt.p1 || mlt.name || '—').split(' ');
+                    const rFull = (mrt.p1 || mrt.name || '—').split(' ');
+                    const lPhoto = mlt.p1img || ''; const rPhoto = mrt.p1img || '';
+                    const row = document.createElement('div');
+                    row.className = 'stats-match-row';
+                    row.innerHTML = `
+                        ${lPhoto ? `<img src="${lPhoto}" class="stats-player-photo" onerror="this.style.display='none'">` : ''}
+                        <div class="stats-player-info">
+                            <div class="stats-player-firstname">${lFull[0].toUpperCase()}</div>
+                            ${lFull.slice(1).join(' ') ? `<div class="stats-player-lastname">${lFull.slice(1).join(' ').toUpperCase()}</div>` : ''}
+                        </div>
+                        <div class="stats-match-center-col">
+                            <div class="stats-match-label-badge">${m.name || 'مباراة ' + (i + 1)}</div>
+                            <div class="stats-match-score-box">${sl} - ${sr}</div>
+                        </div>
+                        <div class="stats-player-info right">
+                            <div class="stats-player-firstname">${rFull[0].toUpperCase()}</div>
+                            ${rFull.slice(1).join(' ') ? `<div class="stats-player-lastname">${rFull.slice(1).join(' ').toUpperCase()}</div>` : ''}
+                        </div>
+                        ${rPhoto ? `<img src="${rPhoto}" class="stats-player-photo" onerror="this.style.display='none'">` : ''}
+                    `;
+                    list.appendChild(row);
+                });
+
+                document.getElementById('series-stats-overlay').classList.add('show');
+            } catch(e) { console.error('Series stats error:', e); }
+        });
+
+        database.ref('settings/logoUrl').on('value', snap => {
+            const url = snap.val();
+            const el = document.getElementById('fed-logo');
+            if (el) el.src = url || 'logo1.png';
+        });
+
+        window.onload = loadActiveMatch;
+    </script>
+
+    <script>
+    (function () {
+        function initRipple() {
+            document.querySelectorAll('button').forEach(function (el) {
+                if (el.dataset.ripple) return;
+                el.dataset.ripple = '1';
+                if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+                el.style.overflow = 'hidden';
+                el.addEventListener('click', function (e) {
+                    var r = document.createElement('span');
+                    r.className = 'ripple-effect';
+                    var rect = el.getBoundingClientRect();
+                    var size = Math.max(rect.width, rect.height);
+                    r.style.width = r.style.height = size + 'px';
+                    r.style.left = (e.clientX - rect.left - size / 2) + 'px';
+                    r.style.top  = (e.clientY - rect.top  - size / 2) + 'px';
+                    el.appendChild(r);
+                    r.addEventListener('animationend', function () { r.remove(); });
+                });
+            });
+        }
+        document.addEventListener('DOMContentLoaded', initRipple);
+    })();
+    </script>
+</body>
+</html>

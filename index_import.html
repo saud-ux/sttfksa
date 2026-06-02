@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>استيراد جدول المباريات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Inter:wght@400;600;700&display=swap" media="print" onload="this.media='all'">    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+          --primary-color: #028C46;
+          --primary-hover: #024F25;
+          --bg-dark: #0d1520;
+          --card-bg: #111d24;
+          --text-white: #ffffff;
+          --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          font-family: 'Inter', 'Cairo', sans-serif;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(ellipse at 50% -5%, rgba(2,140,70,0.12) 0%, transparent 52%),
+                repeating-linear-gradient(45deg, transparent, transparent 7px, rgba(2,140,70,0.025) 7px, rgba(2,140,70,0.025) 8px),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Ccircle cx='20' cy='20' r='3' fill='none' stroke='rgba(2,140,70,0.04)' stroke-width='1'/%3E%3Ccircle cx='70' cy='50' r='3' fill='none' stroke='rgba(2,140,70,0.04)' stroke-width='1'/%3E%3Ccircle cx='100' cy='90' r='3' fill='none' stroke='rgba(2,140,70,0.04)' stroke-width='1'/%3E%3C/svg%3E"),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30,4 L56,30 L30,56 L4,30 Z' fill='none' stroke='rgba(2,140,70,0.06)' stroke-width='1.2'/%3E%3Cpath d='M30,17 L43,30 L30,43 L17,30 Z' fill='none' stroke='rgba(2,140,70,0.04)' stroke-width='1'/%3E%3C/svg%3E");
+            background-size: auto, 8px 8px, 120px 120px, 60px 60px;
+            color: white;
+            font-family: 'Inter', 'Cairo', sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #028C46, transparent);
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .container { max-width: 980px; margin: 0 auto; }
+
+        .back-link {
+            position: fixed; top: 16px; right: 16px; z-index: 999;
+            color: var(--primary-color); text-decoration: none; font-weight: bold;
+            background: rgba(13,21,32,0.9); padding: 8px 14px;
+            border-radius: 8px; border: 1px solid rgba(2,140,70,0.35);
+            backdrop-filter: blur(4px); font-size: 0.9em; transition: 0.3s;
+        }
+        .back-link:hover { filter: brightness(1.1); transform: scale(1.05); box-shadow: 0 4px 12px rgba(2,140,70,0.35); }
+
+        h1 {
+            color: var(--primary-color); text-align: center; margin-bottom: 6px;
+            font-size: clamp(1.3em, 3.5vw, 2em);
+            text-shadow: 0 4px 10px rgba(2,79,37,0.4); padding-top: 10px;
+        }
+        .page-subtitle { text-align: center; color: #555; font-size: 0.85em; margin-bottom: 28px; }
+
+        .section-card {
+            background-color: var(--card-bg); border-radius: 15px; padding: 26px;
+            border: 1px solid rgba(2,140,70,0.25); box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(2,140,70,0.15);
+            margin-bottom: 22px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .section-card:hover {
+            border-color: #028C46;
+            box-shadow: 0 8px 25px rgba(2,140,70,0.35), inset 0 1px 0 rgba(2,140,70,0.15);
+        }
+        .section-card h2 {
+            color: var(--primary-color); margin-top: 0; border-bottom: 2px solid #222;
+            padding-bottom: 13px; margin-bottom: 18px; font-size: 1.12em;
+        }
+
+        button {
+            padding: 10px 18px; border-radius: 8px; border: none;
+            font-weight: bold; cursor: pointer; transition: 0.25s;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
+        button:disabled { opacity: 0.45; cursor: not-allowed; }
+        .btn-yellow { background: linear-gradient(135deg, #028C46, #024F25); color: #fff; box-shadow: 0 4px 12px rgba(2,140,70,0.3); }
+        .btn-yellow:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(2,140,70,0.35); }
+        .btn-green  { background: linear-gradient(135deg, #028C46, #024F25); color: white; box-shadow: 0 4px 12px rgba(2,140,70,0.3); }
+        .btn-green:hover:not(:disabled)  { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(2,140,70,0.35); }
+        .btn-blue   { background: #162C36; color: #028C46; border: 1px solid #028C46; }
+        .btn-blue:hover:not(:disabled)   { background: #028C46; color: #ffffff; transform: translateY(-2px); }
+        .btn-red    { background: #dc3545; color: white; }
+        .btn-red:hover:not(:disabled)    { background: #c82333; }
+        .btn-full { width: 100%; font-size: 1.1em; padding: 15px; }
+
+        .info-box {
+            background: #162C36; border: 1px solid rgba(2,140,70,0.2); border-radius: 10px;
+            padding: 16px 20px; margin-bottom: 18px; color: #999;
+            font-size: 0.87em; line-height: 1.9;
+        }
+        .info-box strong { color: var(--primary-color); }
+        .col-table {
+            width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.85em;
+        }
+        .col-table th {
+            background: rgba(2,140,70,0.15); color: var(--primary-color); padding: 7px 10px;
+            border: 1px solid rgba(2,140,70,0.2); text-align: right; font-weight: bold;
+        }
+        .col-table td {
+            padding: 7px 10px; border: 1px solid rgba(2,140,70,0.1); color: #bbb;
+            background: #162C36;
+        }
+        .col-table tr:nth-child(even) td { background: #111d24; }
+
+        .file-drop-zone {
+            border: 2px dashed rgba(2,140,70,0.3); border-radius: 12px;
+            padding: 40px 20px; text-align: center; cursor: pointer;
+            transition: 0.3s; background: #162C36;
+        }
+        .file-drop-zone:hover, .file-drop-zone.drag-over {
+            border-color: #028C46; background: rgba(2,140,70,0.08);
+            box-shadow: 0 4px 15px rgba(2,140,70,0.2);
+        }
+        .drop-icon { font-size: 3em; margin-bottom: 10px; }
+        .drop-label { color: #888; font-size: 0.95em; }
+        .drop-label strong { color: var(--primary-color); }
+        #file-input { display: none; }
+
+        .file-bar {
+            display: none; align-items: center; gap: 12px;
+            background: #111d24; border: 1px solid rgba(2,140,70,0.25); border-radius: 10px;
+            padding: 13px 16px; margin-top: 14px;
+        }
+        .file-bar .f-icon { font-size: 1.8em; }
+        .file-bar .f-name { flex: 1; color: #eee; font-size: 0.93em; word-break: break-all; }
+        .file-bar .f-meta { color: #555; font-size: 0.78em; }
+
+        .msg-box {
+            display: none; border-radius: 10px; padding: 15px 18px;
+            margin-top: 14px; font-size: 0.9em; line-height: 1.75; white-space: pre-wrap;
+        }
+        .msg-box.error   { background: rgba(220,53,69,0.1);  border: 1px solid rgba(220,53,69,0.35);  color: #f99; }
+        .msg-box.success { background: rgba(40,167,69,0.1);  border: 1px solid rgba(40,167,69,0.35);  color: #7e7; }
+        .msg-box.warning { background: rgba(255,193,7,0.08); border: 1px solid rgba(255,193,7,0.3);   color: #fda; }
+
+        #review-section { display: none; }
+        .review-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 20px; flex-wrap: wrap; gap: 10px;
+        }
+        .review-count {
+            background: var(--primary-color); color: #fff; font-weight: bold;
+            padding: 5px 14px; border-radius: 20px; font-size: 0.88em;
+        }
+        .review-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .match-card {
+            background: #111d24; border: 1px solid rgba(2,140,70,0.25); border-radius: 12px;
+            padding: 20px; margin-bottom: 16px; transition: border-color 0.25s, box-shadow 0.25s;
+            position: relative;
+        }
+        .match-card:hover { border-color: #028C46; box-shadow: 0 4px 15px rgba(2,140,70,0.2); }
+        .match-card.new-card { border-color: #028C46; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+        .card-header {
+            display: flex; align-items: flex-start; gap: 12px;
+            margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #232323;
+            flex-wrap: wrap;
+        }
+        .num-badge-wrap { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; }
+        .num-badge-input {
+            background: var(--primary-color); border: none; border-radius: 50%;
+            color: #fff; font-weight: bold; font-family: inherit;
+            font-size: 0.95em; width: 44px; height: 44px; text-align: center;
+            cursor: text; padding: 0; -moz-appearance: textfield;
+        }
+        .num-badge-input::-webkit-outer-spin-button,
+        .num-badge-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+        .num-badge-input:focus { outline: 2px solid #fff; outline-offset: 2px; }
+        .num-badge-wrap small { color: #444; font-size: 0.62em; }
+
+        .header-fields { display: flex; gap: 8px; flex: 1; min-width: 0; flex-wrap: wrap; }
+        .hf-name  { flex: 2; min-width: 140px; }
+        .hf-sets  { flex: 0 0 86px; }
+
+        .status-badge { padding: 5px 11px; border-radius: 20px; font-size: 0.76em; font-weight: bold; }
+        .status-badge.ready   { background: rgba(40,167,69,0.18); color: #6f6; border: 1px solid rgba(40,167,69,0.3); }
+        .status-badge.missing { background: rgba(255,193,7,0.13); color: #fda; border: 1px solid rgba(255,193,7,0.28); }
+
+        .card-del-btn {
+            position: absolute; top: 12px; left: 12px;
+            background: #1f1f1f; border: 1px solid #333; color: #666;
+            border-radius: 6px; padding: 4px 9px; font-size: 0.78em;
+            cursor: pointer; transition: 0.2s;
+        }
+        .card-del-btn:hover { background: #dc3545; border-color: #dc3545; color: #fff; }
+
+        .teams-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .team-box { background: #111; border: 1px solid #232323; border-radius: 10px; padding: 14px; }
+        .tb-label { color: var(--primary-color); font-size: 0.72em; font-weight: bold; margin-bottom: 10px; letter-spacing: 0.05em; }
+
+        .edit-field { margin-bottom: 9px; }
+        .edit-field:last-child { margin-bottom: 0; }
+        .edit-label { display: block; color: #484848; font-size: 0.7em; margin-bottom: 3px; letter-spacing: 0.04em; }
+        .edit-input {
+            background: #0d0d0d; border: 1px solid #252525; border-radius: 6px;
+            color: #fff; font-family: inherit; padding: 7px 10px;
+            width: 100%; font-size: 0.9em; box-sizing: border-box; transition: border-color 0.2s;
+        }
+        .edit-input:focus { outline: none; border-color: #028C46; box-shadow: 0 0 0 2px rgba(2,140,70,0.15); }
+        .edit-input.bold { font-weight: bold; }
+        .edit-select {
+            background: #0d0d0d; border: 1px solid #252525; border-radius: 6px;
+            color: #fff; font-family: inherit; padding: 7px 10px;
+            width: 100%; font-size: 0.9em; box-sizing: border-box;
+            cursor: pointer; transition: border-color 0.2s;
+        }
+        .edit-select:focus { outline: none; border-color: var(--primary-color); }
+
+        .logo-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+        .logo-preview { width: 46px; height: 46px; object-fit: contain; border-radius: 6px; background: #0a0a0a; border: 1px solid #2a2a2a; display: block; }
+        .logo-preview.hidden { display: none; }
+        .logo-placeholder {
+            width: 46px; height: 46px; border-radius: 6px; background: #181818;
+            border: 1px dashed #333; display: flex; align-items: center;
+            justify-content: center; font-size: 1.3em; color: #444; flex-shrink: 0;
+        }
+        .logo-placeholder.hidden { display: none; }
+        .pick-img-btn {
+            background: #1e1e1e; color: #888; border: 1px solid #2a2a2a;
+            padding: 6px 11px; border-radius: 6px; font-size: 0.76em;
+            cursor: pointer; transition: 0.2s; white-space: nowrap;
+        }
+        .pick-img-btn:hover { background: #282828; color: #fff; border-color: #444; }
+
+        .sponsors-section { margin-top: 12px; }
+        .sp-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .sp-title { color: #555; font-size: 0.74em; font-weight: bold; letter-spacing: 0.05em; }
+        .sp-add-btn {
+            background: #1e1e1e; color: #aaa; border: 1px solid #2a2a2a;
+            padding: 4px 10px; border-radius: 6px; font-size: 0.76em; cursor: pointer; transition: 0.2s;
+        }
+        .sp-add-btn:hover { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
+        .sponsor-row {
+            display: flex; align-items: center; gap: 8px;
+            background: #111; border: 1px solid #1e1e1e; border-radius: 8px;
+            padding: 9px 11px; margin-bottom: 7px; flex-wrap: wrap;
+        }
+        .sp-del {
+            background: #1a1a1a; border: 1px solid #2a2a2a; color: #555;
+            border-radius: 5px; padding: 4px 8px; font-size: 0.76em; cursor: pointer; transition: 0.2s;
+        }
+        .sp-del:hover { background: #dc3545; border-color: #dc3545; color: #fff; }
+
+        .add-match-local {
+            display: flex; align-items: center; justify-content: center;
+            gap: 10px; border: 2px dashed #2a2a2a; border-radius: 12px;
+            padding: 20px; cursor: pointer; transition: 0.3s;
+            background: transparent; width: 100%; color: #555; font-size: 1em; margin-bottom: 20px;
+        }
+        .add-match-local:hover { border-color: #028C46; color: #028C46; background: rgba(2,140,70,0.05); }
+
+        #result-section { display: none; }
+        .progress-wrap { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 20px; margin-bottom: 14px; }
+        .progress-bar-bg { background: #111; border-radius: 20px; height: 12px; overflow: hidden; margin: 10px 0 6px; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #028C46, #024F25); border-radius: 20px; transition: width 0.4s ease; width: 0%; }
+        .progress-lbl { color: #555; font-size: 0.84em; text-align: center; }
+        .result-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid #191919; font-size: 0.87em; }
+        .result-row:last-child { border-bottom: none; }
+        .ri-dot { flex-shrink: 0; }
+        .ri-text { flex: 1; color: #bbb; }
+
+        .container { position: relative; }
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 380px;
+            height: 380px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50,2 L98,50 L50,98 L2,50 Z' fill='%23028C46'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
+        }
+        a[download] {
+            background: #162C36 !important;
+            color: #028C46 !important;
+            border: 1px solid #028C46 !important;
+        }
+        a[download]:hover {
+            background: #028C46 !important;
+            color: #ffffff !important;
+        }
+
+        .steps-row {
+            display: flex;
+            gap: 22px;
+            align-items: flex-start;
+            margin-bottom: 22px;
+        }
+        .steps-row > .section-card {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .section-card { padding: 16px 13px; }
+            .teams-grid { grid-template-columns: 1fr; }
+            .back-link { position: static; display: inline-block; margin-bottom: 14px; }
+            h1 { padding-top: 0; }
+            .steps-row { flex-direction: column; }
+            .steps-row > .section-card { margin-bottom: 0; }
+        }
+        @media (max-width: 480px) {
+            .header-fields { flex-direction: column; }
+            .hf-sets { flex: 1; }
+            button { padding: 8px 12px; font-size: 0.9em; }
+            .btn-full { padding: 12px; font-size: 1em; }
+        }
+
+
+        @keyframes topBarShimmer {
+            0%   { opacity: 0; filter: brightness(1); }
+            50%  { opacity: 1; filter: brightness(1.8); }
+            100% { opacity: 1; filter: brightness(1); }
+        }
+        body::before { animation: topBarShimmer 1.5s ease-out 1 forwards; }
+
+        @keyframes cardEntrance {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-card:hover { transform: translateY(-4px); }
+        .file-drop-zone:hover, .file-drop-zone.drag-over { transform: scale(1.02); }
+
+        @keyframes progressShimmer {
+            0%   { background-position: 200% center; }
+            100% { background-position: -200% center; }
+        }
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #028C46, #03c065, #028C46, #024F25);
+            background-size: 200% auto;
+            animation: progressShimmer 1.5s linear infinite;
+        }
+
+        button:active { transform: scale(0.96); }
+        .edit-input:focus { box-shadow: 0 0 0 3px rgba(2,140,70,0.25); }
+
+        @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
+    </style>
+</head>
+<body>
+<div style="position:fixed;top:0;left:0;right:0;z-index:100;height:4px;background:linear-gradient(90deg,#162B32 0%,#1E9847 40%,#25c45a 60%,#162B32 100%);"></div>
+
+<a href="index.html" class="back-link">← العودة للقائمة الرئسية</a>
+
+<div class="container">
+    <h1> استيراد جدول المباريات</h1>
+    <p class="page-subtitle">رفع ملف إكسل يحتوي على بيانات المباريات</p>
+
+    <div class="steps-row">
+
+    <div class="section-card">
+        <h2>١. تحميل نموذج الإكسل</h2>
+
+        <div class="info-box">
+            <strong>كيفية الاستخدام:</strong><br>
+            ١. حمّل النموذج أدناه وافتحه في برنامج إكسل أو أي برنامج جداول.<br>
+            ٢. أضف مباراة جديدة في كل صف — كل صف = مباراة واحدة.<br>
+            ٣. احفظ الملف ثم ارفعه في القسم الثاني. يمكن إضافة الشعارات لاحقاً من الشاشة.<br><br>
+
+            <strong>أعمدة الملف:</strong>
+            <table class="col-table">
+                <tr>
+                    <th>العمود</th>
+                    <th>المحتوى</th>
+                    <th>مثال</th>
+                    <th>إلزامي؟</th>
+                </tr>
+                <tr><td>A</td><td>رقم المباراة</td><td>1</td><td>✅</td></tr>
+                <tr><td>B</td><td>اسم المباراة</td><td>النهائي</td><td>✅</td></tr>
+                <tr><td>C</td><td>عدد الأشواط (5 أو 7)</td><td>7</td><td>✅</td></tr>
+                <tr><td>D</td><td>اسم الفريق الأيسر</td><td></td><td>✅</td></tr>
+                <tr><td>E</td><td>لاعب/و الفريق الأيسر</td><td></td><td>✅</td></tr>
+                <tr><td>F</td><td>اسم الفريق الأيمن</td><td></td><td>✅</td></tr>
+                <tr><td>G</td><td>لاعب/و الفريق الأيمن</td><td></td><td>✅</td></tr>
+                <tr><td>H – L</td><td>أسماء الرعاة (حتى 5)</td><td>STC</td><td>اختياري</td></tr>
+            </table>
+        </div>
+
+        <button class="btn-yellow" onclick="downloadTemplate()">
+            ⬇ تحميل نموذج إكسل
+        </button>
+    </div>
+
+    <div class="section-card">
+        <h2>٢. رفع ملف إكسل</h2>
+
+        <div class="file-drop-zone" id="drop-zone"
+             onclick="openFilePicker()"
+             ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+            <div class="drop-icon">📊</div>
+            <div class="drop-label">
+                <strong>اضغط هنا لاختيار الملف</strong><br>
+                أو اسحب ملف إكسل وأفلته هنا
+            </div>
+        </div>
+        <input type="file" id="file-input" accept=".xlsx,.xls" onchange="onFileSelected(event)">
+
+        <div class="file-bar" id="file-bar">
+            <div class="f-icon">📊</div>
+            <div>
+                <div class="f-name" id="f-name">—</div>
+                <div class="f-meta" id="f-meta">—</div>
+            </div>
+            <button class="btn-red" style="padding:6px 12px; font-size:0.82em;" onclick="clearAll()">✕ مسح</button>
+        </div>
+
+        <div class="msg-box" id="upload-error"></div>
+    </div>
+
+    </div>
+
+    <div id="review-section">
+        <div class="section-card">
+            <h2>٣. مراجعة وتعديل المباريات</h2>
+
+            <div class="review-header">
+                <div id="review-count" class="review-count">٠ مباريات</div>
+                <div class="review-actions">
+                    <button class="btn-red" style="font-size:0.83em; padding:7px 14px;" onclick="clearAll()">
+                        ✕ إلغاء
+                    </button>
+                </div>
+            </div>
+
+            <div id="cards-container"></div>
+
+            <button class="add-match-local" onclick="addLocalMatch()">
+                <span style="font-size:1.4em;">＋</span>
+                <span>
+                    <strong>إضافة مباراة يدوياً</strong><br>
+                    <small style="font-weight:normal;">أضف مباراة إضافية بدون إكسل</small>
+                </span>
+            </button>
+
+            <div style="border-top: 1px solid #1e1e1e; padding-top: 20px;">
+                <button class="btn-green btn-full" id="import-btn" onclick="startImport()">
+                    🚀 استيراد جميع المباريات
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="result-section">
+        <div class="section-card">
+            <h2>٤. نتيجة الاستيراد</h2>
+            <div class="progress-wrap" id="progress-wrap">
+                <div style="color:#666; font-size:0.88em;">جارٍ الاستيراد…</div>
+                <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-bar"></div></div>
+                <div class="progress-lbl" id="prog-lbl">0 / 0</div>
+            </div>
+            <div class="msg-box" id="result-msg"></div>
+            <div id="result-rows" style="margin-top:10px;"></div>
+        </div>
+    </div>
+
+</div>
+
+  <script src="config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+const firebaseConfig = APP_CONFIG.firebase;
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
+const IS_LOCAL = ['', 'localhost', '127.0.0.1'].includes(location.hostname);
+
+let parsedMatches = [];
+
+function downloadTemplate() {
+    const headers = [
+        'رقم المباراة',
+        'اسم المباراة',
+        'الأشواط (5 أو 7)',
+        'الفريق الأيسر',
+        'لاعبو الفريق الأيسر',
+        'الفريق الأيمن',
+        'لاعبو الفريق الأيمن',
+        'راعي 1',
+        'راعي 2',
+        'راعي 3',
+        'راعي 4',
+        'راعي 5'
+    ];
+    const ws = XLSX.utils.aoa_to_sheet([headers]);
+    ws['!cols'] = [
+        {wch:14},{wch:22},{wch:12},
+        {wch:18},{wch:24},{wch:18},{wch:24},
+        {wch:14},{wch:14},{wch:14},{wch:14},{wch:14}
+    ];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'المباريات');
+    XLSX.writeFile(wb, 'tournament_template.xlsx');
+}
+
+function openFilePicker() {
+    const inp = document.getElementById('file-input');
+    inp.value = '';
+    inp.click();
+}
+
+function onDragOver(e)  { e.preventDefault(); document.getElementById('drop-zone').classList.add('drag-over'); }
+function onDragLeave()  { document.getElementById('drop-zone').classList.remove('drag-over'); }
+function onDrop(e)      { e.preventDefault(); onDragLeave(); const f = e.dataTransfer.files[0]; if (f) processFile(f); }
+function onFileSelected(e) { const f = e.target.files[0]; if (f) processFile(f); }
+
+function processFile(file) {
+    hideMsg('upload-error');
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (ext !== 'xlsx' && ext !== 'xls') {
+        showMsg('upload-error', 'error', 'يجب أن يكون الملف بصيغة إكسل (.xlsx أو .xls).');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('file-input').value = '';
+        try {
+            const data     = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet    = workbook.Sheets[workbook.SheetNames[0]];
+            const rows     = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', raw: false });
+
+            if (rows.length < 2) {
+                showMsg('upload-error', 'error', 'الملف فارغ — لا توجد مباريات. الصف الأول مخصص للعناوين، أضف البيانات من الصف الثاني.');
+                return;
+            }
+
+            const { matches, errors } = rowsToMatches(rows);
+
+            if (errors.length > 0) {
+                showMsg('upload-error', 'error', errors.join('\n'));
+                return;
+            }
+
+            hideMsg('upload-error');
+            parsedMatches = matches;
+
+            document.getElementById('file-bar').style.display = 'flex';
+            document.getElementById('f-name').textContent = file.name;
+            document.getElementById('f-meta').textContent =
+                'الحجم: ' + formatBytes(file.size) + '  ·  ' + matches.length + ' مباراة';
+
+            buildReviewScreen();
+
+        } catch(err) {
+            showMsg('upload-error', 'error', 'تعذّر قراءة الملف:\n' + err.message);
+        }
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+function rowsToMatches(rows) {
+    const matches  = [];
+    const errors   = [];
+    const seenNums = new Set();
+
+    for (let ri = 1; ri < rows.length; ri++) {
+        const r   = rows[ri];
+        const row = ri + 1;
+
+        if (r.every(function(c){ return String(c).trim() === ''; })) continue;
+
+        const label = 'صف ' + row;
+
+        const numRaw  = String(r[0] || '').trim();
+        const name    = String(r[1] || '').trim();
+        const setsRaw = String(r[2] || '').trim();
+        const lName   = String(r[3] || '').trim();
+        const lP1     = String(r[4] || '').trim();
+        const rName   = String(r[5] || '').trim();
+        const rP1     = String(r[6] || '').trim();
+
+        const sponsors = [];
+        for (let si = 7; si <= 11; si++) {
+            const spName = String(r[si] || '').trim();
+            if (spName) sponsors.push({ name: spName, logo: '' });
+        }
+
+        let hasError = false;
+
+        const num = parseInt(numRaw, 10);
+        if (!numRaw || isNaN(num) || num < 1) {
+            errors.push(label + ' — العمود A (رقم المباراة) مفقود أو غير صحيح.');
+            hasError = true;
+        } else if (seenNums.has(num)) {
+            errors.push(label + ' — رقم المباراة ' + num + ' مكرر في الملف.');
+            hasError = true;
+        } else { seenNums.add(num); }
+
+        if (!name) { errors.push(label + ' — العمود B (اسم المباراة) فارغ.'); hasError = true; }
+
+        const sets = parseInt(setsRaw, 10);
+        if (sets !== 5 && sets !== 7) {
+            errors.push(label + ' — العمود C (الأشواط) يجب أن يكون 5 أو 7.');
+            hasError = true;
+        }
+
+        if (!lName) { errors.push(label + ' — العمود D (الفريق الأيسر) فارغ.');  hasError = true; }
+        if (!lP1)   { errors.push(label + ' — العمود E (لاعب الفريق الأيسر) فارغ.'); hasError = true; }
+        if (!rName) { errors.push(label + ' — العمود F (الفريق الأيمن) فارغ.');   hasError = true; }
+        if (!rP1)   { errors.push(label + ' — العمود G (لاعب الفريق الأيمن) فارغ.'); hasError = true; }
+
+        if (!hasError) {
+            matches.push({
+                number: num,
+                name: name,
+                round: '',
+                sets: sets,
+                teams: {
+                    left:  { name: lName, logo: '', p1: lP1 },
+                    right: { name: rName, logo: '', p1: rP1 }
+                },
+                sponsors: sponsors
+            });
+        }
+    }
+
+    return { matches, errors };
+}
+
+function clearAll() {
+    parsedMatches = [];
+    document.getElementById('file-input').value = '';
+    document.getElementById('file-bar').style.display = 'none';
+    document.getElementById('f-name').textContent = '—';
+    document.getElementById('f-meta').textContent = '—';
+    hideMsg('upload-error');
+    document.getElementById('review-section').style.display = 'none';
+    document.getElementById('result-section').style.display = 'none';
+    document.getElementById('cards-container').innerHTML = '';
+}
+
+function buildReviewScreen() {
+    const container = document.getElementById('cards-container');
+    container.innerHTML = '';
+    parsedMatches.forEach(function(m, idx) {
+        var card = makeCard(m, idx);
+        card.style.animation = 'slideIn 0.4s ease-out ' + (idx * 80) + 'ms both';
+        container.appendChild(card);
+    });
+    updateCountBadge();
+    document.getElementById('review-section').style.display = 'block';
+    document.getElementById('result-section').style.display = 'none';
+    document.getElementById('review-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function updateCountBadge() {
+    const n = parsedMatches.length;
+    document.getElementById('review-count').textContent =
+        n + ' مبار' + (n === 1 ? 'اة' : 'يات');
+}
+
+function addLocalMatch() {
+    const maxNum = parsedMatches.reduce(function(mx, m){ return Math.max(mx, m.number||0); }, 0);
+    const blank = {
+        number: maxNum + 1,
+        name: '', round: '', sets: 5,
+        teams: {
+            left:  { name: '', logo: '', p1: '' },
+            right: { name: '', logo: '', p1: '' }
+        },
+        sponsors: []
+    };
+    const idx = parsedMatches.length;
+    parsedMatches.push(blank);
+    const card = makeCard(blank, idx);
+    card.classList.add('new-card');
+    document.getElementById('cards-container').appendChild(card);
+    updateCountBadge();
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function removeCard(idx) {
+    parsedMatches.splice(idx, 1);
+    const container = document.getElementById('cards-container');
+    container.innerHTML = '';
+    parsedMatches.forEach(function(m, i){ container.appendChild(makeCard(m, i)); });
+    updateCountBadge();
+}
+
+function makeCard(match, idx) {
+    const card = document.createElement('div');
+    card.className = 'match-card';
+    card.id = 'card-' + idx;
+
+    const sel5 = match.sets === 5 ? 'selected' : '';
+    const sel7 = match.sets === 7 ? 'selected' : '';
+    const allReady = matchHasAllLogos(match);
+
+    card.innerHTML = `
+        <button class="card-del-btn" onclick="removeCard(${idx})" title="حذف هذه المباراة">✕ حذف</button>
+
+        <div class="card-header">
+            <div class="num-badge-wrap">
+                <input type="number" class="num-badge-input" min="1"
+                       value="${esc(String(match.number))}"
+                       title="رقم المباراة"
+                       oninput="onMatchNum(${idx}, this.value)">
+                <small>#</small>
+            </div>
+            <div class="header-fields">
+                <div class="hf-name">
+                    <label class="edit-label">اسم المباراة</label>
+                    <input class="edit-input bold" type="text"
+                           value="${esc(match.name)}" placeholder="مثال: النهائي"
+                           oninput="onMatch(${idx}, 'name', this.value)">
+                </div>
+                <div class="hf-sets">
+                    <label class="edit-label">الأشواط</label>
+                    <select class="edit-select" onchange="onMatchSets(${idx}, this.value)">
+                        <option value="5" ${sel5}>5</option>
+                        <option value="7" ${sel7}>7</option>
+                    </select>
+                </div>
+            </div>
+            <div id="badge-${idx}">
+                ${badgeHtml(allReady)}
+            </div>
+        </div>
+
+        <div class="teams-grid">
+            <div class="team-box">
+                <div class="tb-label">🔵 الفريق الأيسر</div>
+                <div class="edit-field">
+                    <label class="edit-label">اسم الفريق</label>
+                    <input class="edit-input bold" type="text"
+                           value="${esc(match.teams.left.name)}" placeholder="اسم الفريق"
+                           oninput="onTeam(${idx}, 'left', 'name', this.value)">
+                </div>
+                <div class="edit-field">
+                    <label class="edit-label">اللاعب / اللاعبون</label>
+                    <input class="edit-input" type="text"
+                           value="${esc(match.teams.left.p1)}" placeholder="اسم اللاعب أو اللاعبين"
+                           oninput="onTeam(${idx}, 'left', 'p1', this.value)">
+                </div>
+                <div class="logo-row" id="lr-left-${idx}">
+                    ${logoHtml('left', idx, match.teams.left.logo)}
+                    <button class="pick-img-btn" onclick="pickImg('left', ${idx})">📁 شعار</button>
+                </div>
+            </div>
+            <div class="team-box">
+                <div class="tb-label">🔴 الفريق الأيمن</div>
+                <div class="edit-field">
+                    <label class="edit-label">اسم الفريق</label>
+                    <input class="edit-input bold" type="text"
+                           value="${esc(match.teams.right.name)}" placeholder="اسم الفريق"
+                           oninput="onTeam(${idx}, 'right', 'name', this.value)">
+                </div>
+                <div class="edit-field">
+                    <label class="edit-label">اللاعب / اللاعبون</label>
+                    <input class="edit-input" type="text"
+                           value="${esc(match.teams.right.p1)}" placeholder="اسم اللاعب أو اللاعبين"
+                           oninput="onTeam(${idx}, 'right', 'p1', this.value)">
+                </div>
+                <div class="logo-row" id="lr-right-${idx}">
+                    ${logoHtml('right', idx, match.teams.right.logo)}
+                    <button class="pick-img-btn" onclick="pickImg('right', ${idx})">📁 شعار</button>
+                </div>
+            </div>
+        </div>
+<!-- Copyright (c) 2026 Saud Alhamad. All rights reserved. Licensed to STTF. -->
+
+        ${sponsorsHtml(match, idx)}
+    `;
+
+    return card;
+}
+
+function badgeHtml(ready) {
+    return ready
+        ? '<span class="status-badge ready">✓ جاهز</span>'
+        : '<span class="status-badge missing">⚠ شعار مفقود</span>';
+}
+
+function logoHtml(side, idx, url) {
+    const imgId = 'limg-' + side + '-' + idx;
+    const phId  = 'lph-'  + side + '-' + idx;
+    if (hasLogo(url)) {
+        return `<img id="${imgId}" class="logo-preview" src="${esc(url)}" alt="logo"
+                     onerror="this.style.display='none';document.getElementById('${phId}').classList.remove('hidden')">
+                <div id="${phId}" class="logo-placeholder hidden">🖼</div>`;
+    }
+    return `<img id="${imgId}" class="logo-preview hidden" src="" alt="">
+            <div id="${phId}" class="logo-placeholder">🖼</div>`;
+}
+
+function sponsorsHtml(match, idx) {
+    let html = `<div class="sponsors-section" id="sp-section-${idx}">
+        <div class="sp-header">
+            <span class="sp-title">الرعاة</span>
+            <button class="sp-add-btn" onclick="addSponsor(${idx})">＋ إضافة راعي</button>
+        </div>
+        <div id="sp-list-${idx}">`;
+
+    (match.sponsors || []).forEach(function(sp, si) {
+        html += sponsorRowHtml(idx, si, sp);
+    });
+
+    html += '</div></div>';
+    return html;
+}
+
+function sponsorRowHtml(idx, si, sp) {
+    const imgId = 'simg-' + idx + '-' + si;
+    const phId  = 'sph-'  + idx + '-' + si;
+    let prev;
+    if (hasLogo(sp.logo)) {
+        prev = `<img id="${imgId}" class="logo-preview" src="${esc(sp.logo)}" alt="sp"
+                     style="width:34px;height:34px;"
+                     onerror="this.style.display='none';document.getElementById('${phId}').classList.remove('hidden')">
+                <div id="${phId}" class="logo-placeholder hidden" style="width:34px;height:34px;">🖼</div>`;
+    } else {
+        prev = `<img id="${imgId}" class="logo-preview hidden" src="" alt="" style="width:34px;height:34px;">
+                <div id="${phId}" class="logo-placeholder" style="width:34px;height:34px;">🖼</div>`;
+    }
+    return `<div class="sponsor-row" id="sp-row-${idx}-${si}">
+        ${prev}
+        <input class="edit-input" type="text" style="flex:1; min-width:80px;"
+               value="${esc(sp.name)}" placeholder="اسم الراعي"
+               oninput="onSponsor(${idx}, ${si}, 'name', this.value)">
+        <button class="pick-img-btn" onclick="pickImg('sponsor', ${idx}, ${si})">📁 شعار</button>
+        <button class="sp-del" onclick="removeSponsor(${idx}, ${si})">✕</button>
+    </div>`;
+}
+
+function addSponsor(idx) {
+    parsedMatches[idx].sponsors = parsedMatches[idx].sponsors || [];
+    const si = parsedMatches[idx].sponsors.length;
+    parsedMatches[idx].sponsors.push({ name: '', logo: '' });
+    const list = document.getElementById('sp-list-' + idx);
+    if (list) list.insertAdjacentHTML('beforeend', sponsorRowHtml(idx, si, { name: '', logo: '' }));
+}
+
+function removeSponsor(idx, si) {
+    parsedMatches[idx].sponsors.splice(si, 1);
+    const list = document.getElementById('sp-list-' + idx);
+    if (!list) return;
+    list.innerHTML = '';
+    parsedMatches[idx].sponsors.forEach(function(sp, i) {
+        list.insertAdjacentHTML('beforeend', sponsorRowHtml(idx, i, sp));
+    });
+}
+
+function onMatch(idx, field, val)      { parsedMatches[idx][field] = val; }
+function onMatchSets(idx, val)         { const s = parseInt(val,10); if (s===5||s===7) parsedMatches[idx].sets = s; }
+function onMatchNum(idx, val)          { const n = parseInt(val,10); if (!isNaN(n)&&n>0) parsedMatches[idx].number = n; }
+function onTeam(idx, side, field, val) { parsedMatches[idx].teams[side][field] = val; }
+function onSponsor(idx, si, field, val){ if (parsedMatches[idx].sponsors[si] !== undefined) parsedMatches[idx].sponsors[si][field] = val; }
+
+function pickImg(target, matchIdx, sponsorIdx) {
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'image/*';
+    inp.onchange = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            const b64 = ev.target.result;
+            let imgId, phId;
+            if (target === 'left') {
+                parsedMatches[matchIdx].teams.left.logo = b64;
+                imgId = 'limg-left-' + matchIdx; phId = 'lph-left-' + matchIdx;
+            } else if (target === 'right') {
+                parsedMatches[matchIdx].teams.right.logo = b64;
+                imgId = 'limg-right-' + matchIdx; phId = 'lph-right-' + matchIdx;
+            } else {
+                parsedMatches[matchIdx].sponsors[sponsorIdx].logo = b64;
+                imgId = 'simg-' + matchIdx + '-' + sponsorIdx;
+                phId  = 'sph-'  + matchIdx + '-' + sponsorIdx;
+            }
+            const img = document.getElementById(imgId);
+            const ph  = document.getElementById(phId);
+            if (img) { img.src = b64; img.style.display = ''; img.classList.remove('hidden'); }
+            if (ph)  { ph.classList.add('hidden'); }
+            refreshBadge(matchIdx);
+        };
+        reader.readAsDataURL(file);
+    };
+    inp.click();
+}
+
+function refreshBadge(idx) {
+    const el = document.getElementById('badge-' + idx);
+    if (el) el.innerHTML = badgeHtml(matchHasAllLogos(parsedMatches[idx]));
+}
+
+async function startImport() {
+    if (parsedMatches.length === 0) { alert('لا توجد مباريات للاستيراد.'); return; }
+
+    const missing = [];
+    parsedMatches.forEach(function(m) {
+        const lbl = 'مباراة #' + m.number;
+        if (!m.name  || !m.name.trim())                missing.push(lbl + ' — اسم المباراة فارغ');
+        if (!m.teams.left.name  || !m.teams.left.name.trim())  missing.push(lbl + ' — اسم الفريق الأيسر فارغ');
+        if (!m.teams.left.p1   || !m.teams.left.p1.trim())    missing.push(lbl + ' — لاعب الفريق الأيسر فارغ');
+        if (!m.teams.right.name || !m.teams.right.name.trim()) missing.push(lbl + ' — اسم الفريق الأيمن فارغ');
+        if (!m.teams.right.p1  || !m.teams.right.p1.trim())   missing.push(lbl + ' — لاعب الفريق الأيمن فارغ');
+    });
+    if (missing.length > 0) {
+        showMsg('upload-error', 'error', '⚠ يوجد حقول فارغة:\n\n' + missing.join('\n'));
+        document.getElementById('upload-error').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+
+    const importBtn = document.getElementById('import-btn');
+    importBtn.disabled = true;
+
+    document.getElementById('result-section').style.display = 'block';
+    document.getElementById('result-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('progress-wrap').style.display = 'block';
+    hideMsg('result-msg');
+    document.getElementById('result-rows').innerHTML = '';
+    setProgress(0, parsedMatches.length);
+
+    let snap;
+    try { snap = await database.ref('matches').once('value'); }
+    catch(err) {
+        showMsg('result-msg', 'error', 'فشل الاتصال بالخادم:\n' + err.message);
+        importBtn.disabled = false; return;
+    }
+
+    const existing  = snap.val() || {};
+    const existNums = new Set(Object.values(existing).map(function(m){ return m && m.number; }).filter(Boolean));
+    const dupes     = parsedMatches.map(function(m){return m.number;}).filter(function(n){return existNums.has(n);});
+
+    if (dupes.length > 0) {
+        document.getElementById('progress-wrap').style.display = 'none';
+        showMsg('result-msg', 'error',
+            'تم إيقاف الاستيراد — أرقام مكررة موجودة مسبقاً:\n\n' +
+            dupes.map(function(n){return '• مباراة رقم ' + n;}).join('\n') +
+            '\n\nاحذف هذه المباريات أولاً أو غيّر أرقامها.');
+        importBtn.disabled = false; return;
+    }
+
+    const ts = Date.now();
+    const results = [];
+    let ok = 0;
+
+    const matchesToImport = parsedMatches.map(function(m) {
+        return {
+            name:       m.name.trim(),
+            number:     m.number,
+            round:      m.round.trim(),
+            gameScore:  '0 - 0',
+            matchScore: '0 - 0',
+            setScore:   '0 - 0',
+            serve:      'center',
+            teams: {
+                left:  { name: m.teams.left.name.trim(),  logo: m.teams.left.logo  || '', p1: m.teams.left.p1.trim()  },
+                right: { name: m.teams.right.name.trim(), logo: m.teams.right.logo || '', p1: m.teams.right.p1.trim() }
+            },
+            sponsors: (m.sponsors || []).map(function(sp){ return { name: sp.name.trim(), logo: sp.logo || '' }; }),
+            cards: {
+                leftCard:false, rightCard:false, leftYR1:false, leftYR2:false,
+                rightYR1:false, rightYR2:false, leftWhite:false, rightWhite:false
+            },
+            createdAt: String(ts)
+        };
+    });
+
+    setProgress(0, 1);
+    try {
+        let data;
+        if (IS_LOCAL) {
+            const writes = matchesToImport.map(function(m) {
+                return database.ref('matches/' + m.key).set(m);
+            });
+            await Promise.all(writes);
+            data = { ok: true };
+        } else {
+            const res = await fetch('/.netlify/functions/s245645645', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'importMatches', matches: matchesToImport })
+            });
+            data = await res.json();
+        }
+        if (data.ok) {
+            ok = matchesToImport.length;
+            matchesToImport.forEach(function(m){ results.push({ ok: true, num: m.number, name: m.name }); });
+        } else {
+            matchesToImport.forEach(function(m){ results.push({ ok: false, num: m.number, name: m.name, err: data.error }); });
+        }
+    } catch(err) {
+        matchesToImport.forEach(function(m){ results.push({ ok: false, num: m.number, name: m.name, err: err.message }); });
+    }
+    setProgress(1, 1);
+
+    const firstSets   = parsedMatches[0].sets;
+    const allSameSets = parsedMatches.every(function(m){ return m.sets === firstSets; });
+    let setsNote = '';
+    try {
+        if (IS_LOCAL) {
+            await database.ref('settings/gameColumns').set(firstSets);
+        } else {
+            await fetch('/.netlify/functions/s245645645', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'setGameColumns', cols: firstSets })
+            });
+        }
+        if (!allSameSets) setsNote = '\n\n⚠ الملف يحتوي على قيم أشواط مختلطة. تم تطبيق قيمة أول مباراة (' + firstSets + ').';
+    } catch(err) {
+        setsNote = '\n\n⚠ تعذّر تحديث إعدادات الأشواط: ' + err.message;
+    }
+
+    document.getElementById('progress-wrap').style.display = 'none';
+    const fail = results.filter(function(r){return !r.ok;}).length;
+
+    showMsg('result-msg', fail === 0 ? 'success' : 'warning',
+        fail === 0
+            ? '✓ تم الاستيراد بنجاح!\nتم استيراد ' + ok + ' مباريات.' + setsNote
+            : '⚠ اكتمل مع أخطاء.\nنجح: ' + ok + ' · فشل: ' + fail + setsNote);
+
+    const rr = document.getElementById('result-rows');
+    results.forEach(function(r) {
+        const row = document.createElement('div');
+        row.className = 'result-row';
+        row.innerHTML = r.ok
+            ? `<span class="ri-dot" style="color:#6f6;">✓</span>
+               <span class="ri-text">مباراة #${esc(String(r.num))} — ${esc(r.name)} <span style="color:#444;font-size:0.8em;">(${esc(r.id)})</span></span>`
+            : `<span class="ri-dot" style="color:#f88;">✗</span>
+               <span class="ri-text" style="color:#f88;">مباراة #${esc(String(r.num))} — ${esc(r.name)} — ${esc(r.err)}</span>`;
+        rr.appendChild(row);
+    });
+
+    if (fail > 0) importBtn.disabled = false;
+}
+
+function setProgress(done, total) {
+    const p = total ? Math.round(done/total*100) : 0;
+    document.getElementById('prog-bar').style.width = p + '%';
+    document.getElementById('prog-lbl').textContent = done + ' / ' + total + ' (' + p + '%)';
+}
+
+function hasLogo(u) { return u && typeof u === 'string' && u.trim() !== ''; }
+function matchHasAllLogos(m) {
+    if (!hasLogo(m.teams.left.logo) || !hasLogo(m.teams.right.logo)) return false;
+    return !(m.sponsors || []).some(function(sp){ return !hasLogo(sp.logo); });
+}
+function showMsg(id, type, msg) {
+    const el = document.getElementById(id);
+    el.className = 'msg-box ' + type;
+    el.textContent = msg;
+    el.style.display = 'block';
+}
+function hideMsg(id) { const el = document.getElementById(id); el.style.display = 'none'; el.textContent = ''; }
+function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function formatBytes(b) {
+    if (b < 1024) return b + ' B';
+    if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+    return (b/1048576).toFixed(1) + ' MB';
+}
+</script>
+
+
+<script>
+(function () {
+    function initRipple() {
+        document.querySelectorAll('button').forEach(function (btn) {
+            if (btn.dataset.ripple) return;
+            btn.dataset.ripple = '1';
+            btn.style.position = 'relative';
+            btn.style.overflow = 'hidden';
+            btn.addEventListener('click', function (e) {
+                var r = btn.getBoundingClientRect();
+                var span = document.createElement('span');
+                span.className = 'ripple-effect';
+                var size = Math.max(r.width, r.height);
+                span.style.cssText = 'position:absolute;border-radius:50%;transform:scale(0);animation:rippleAnim 0.55s linear;pointer-events:none;background:rgba(255,255,255,0.28);width:' + size + 'px;height:' + size + 'px;left:' + (e.clientX - r.left - size / 2) + 'px;top:' + (e.clientY - r.top - size / 2) + 'px;';
+                btn.appendChild(span);
+                span.addEventListener('animationend', function () { span.remove(); });
+            });
+        });
+    }
+    function animateCards() {
+        document.querySelectorAll('.section-card').forEach(function (card, i) {
+            card.style.animation = 'cardEntrance 0.5s ease-out ' + (i * 100) + 'ms both';
+        });
+    }
+    document.addEventListener('DOMContentLoaded', function () {
+        initRipple();
+        animateCards();
+        var observer = new MutationObserver(function () { initRipple(); });
+        var container = document.getElementById('cards-container');
+        if (container) observer.observe(container, { childList: true, subtree: true });
+    });
+})();
+</script>
+
+</body>
+</html>

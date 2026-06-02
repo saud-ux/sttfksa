@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام العداد الإلكتروني</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Inter:wght@400;600;700&display=swap" media="print" onload="this.media='all'">
+  <style>
+    :root {
+      --primary-color: #028C46;
+      --primary-hover: #024F25;
+      --bg-dark: #0d1520;
+      --card-bg: #111d24;
+      --text-white: #ffffff;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: 'Inter', 'Cairo', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-white);
+      font-family: 'Inter', 'Cairo', sans-serif;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse at 50% -5%, rgba(2,140,70,0.12) 0%, transparent 52%),
+        repeating-linear-gradient(45deg, transparent, transparent 7px, rgba(2,140,70,0.025) 7px, rgba(2,140,70,0.025) 8px),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Ccircle cx='20' cy='20' r='3' fill='none' stroke='rgba(2,140,70,0.04)' stroke-width='1'/%3E%3Ccircle cx='70' cy='50' r='3' fill='none' stroke='rgba(2,140,70,0.04)' stroke-width='1'/%3E%3Ccircle cx='100' cy='90' r='3' fill='none' stroke='rgba(2,140,70,0.04)' stroke-width='1'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30,4 L56,30 L30,56 L4,30 Z' fill='none' stroke='rgba(2,140,70,0.06)' stroke-width='1.2'/%3E%3Cpath d='M30,17 L43,30 L30,43 L17,30 Z' fill='none' stroke='rgba(2,140,70,0.04)' stroke-width='1'/%3E%3C/svg%3E");
+      background-size: auto, 8px 8px, 120px 120px, 60px 60px;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #028C46, transparent);
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 600px;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      color: var(--primary-color);
+      font-size: clamp(1.3rem, 5vw, 2.5rem);
+      font-weight: 900;
+      margin-bottom: clamp(20px, 4vh, 40px);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-shadow: 0 4px 10px rgba(2, 79, 37, 0.4);
+    }
+
+    .match-selector {
+      background-color: var(--card-bg);
+      padding: 30px;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(2, 140, 70, 0.25);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(2,140,70,0.15);
+      transition: var(--transition);
+    }
+
+    .match-selector:hover {
+      border-color: #028C46;
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(2, 140, 70, 0.35), inset 0 1px 0 rgba(2,140,70,0.15);
+    }
+
+    .match-selector h2 {
+      color: var(--primary-color);
+      margin: 0 0 20px 0;
+      font-size: 1.4rem;
+    }
+
+    #match-search {
+      width: 100%;
+      padding: 11px 15px;
+      font-size: 1rem;
+      background-color: #1a2830;
+      color: white;
+      border: 2px solid rgba(2,140,70,0.25);
+      border-radius: 12px;
+      margin-bottom: 10px;
+      font-family: 'Inter', 'Cairo', sans-serif;
+      outline: none;
+      box-sizing: border-box;
+      transition: var(--transition);
+    }
+
+    #match-search::placeholder { color: #666; }
+    #match-search:focus { border-color: var(--primary-color); }
+
+    #no-results {
+      display: none;
+      color: #888;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+
+    select {
+      width: 100%;
+      padding: 12px 15px;
+      font-size: 1.1rem;
+      background-color: #1a2830;
+      color: white;
+      border: 2px solid rgba(2,140,70,0.25);
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-family: 'Inter', 'Cairo', sans-serif;
+      outline: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    select:focus { border-color: #028C46; }
+
+    .btn-action {
+      width: 100%;
+      padding: 12px;
+      font-size: 1.2rem;
+      background: linear-gradient(135deg, #028C46, #024F25);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: var(--transition);
+      box-shadow: 0 4px 15px rgba(2, 140, 70, 0.3);
+    }
+
+    .btn-action:hover {
+      filter: brightness(1.1);
+      box-shadow: 0 8px 25px rgba(2, 140, 70, 0.35);
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 15px;
+    }
+
+    .menu-grid a {
+      padding: 20px 15px;
+      font-size: 1.1rem;
+      text-decoration: none;
+      border-radius: 15px;
+      color: #1a1a1a;
+      font-weight: 700;
+      background-color: var(--primary-color);
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(2, 140, 70, 0.15);
+      color: #fff;
+    }
+
+    .menu-grid a:hover {
+      background-color: var(--primary-hover);
+      transform: scale(1.03);
+      box-shadow: 0 8px 25px rgba(2, 140, 70, 0.35);
+    }
+
+    .menu-grid a.admin {
+      background-color: #162C36;
+      color: var(--primary-color);
+      border: 1px solid #028C46;
+    }
+
+    .menu-grid a.admin:hover {
+      background-color: #028C46;
+      color: #ffffff;
+    }
+
+    .admin-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .admin-link {
+      padding: clamp(12px, 2vw, 20px) clamp(18px, 3vw, 30px);
+      font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+      text-decoration: none;
+      border-radius: 15px;
+      color: var(--primary-color);
+      font-weight: 700;
+      background-color: #162C36;
+      border: 1px solid #028C46;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      flex: 1;
+      min-width: 130px;
+    }
+
+    .admin-link:hover {
+      background-color: #028C46;
+      color: #ffffff;
+    }
+
+    .container {
+      position: relative;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 380px;
+      height: 380px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50,2 L98,50 L50,98 L2,50 Z' fill='%23028C46'/%3E%3C/svg%3E");
+      background-size: contain;
+      background-repeat: no-repeat;
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    a[download] {
+      background: #162C36 !important;
+      color: #028C46 !important;
+      border: 1px solid #028C46 !important;
+    }
+    a[download]:hover {
+      background: #028C46 !important;
+      color: #ffffff !important;
+    }
+
+    @media (max-width: 768px) {
+      .menu-grid { grid-template-columns: 1fr 1fr; }
+      .container { padding: 30px 15px; }
+      .match-selector { padding: 22px 15px; }
+    }
+
+    @media (max-width: 480px) {
+      .menu-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 1.5rem; }
+      .container { padding: 20px 12px; }
+      .match-selector { padding: 18px 12px; }
+      .match-selector h2 { font-size: 1.1rem; }
+      .menu-grid a { padding: 15px 10px; font-size: 1rem; }
+      .admin-row { grid-template-columns: 1fr; }
+      .admin-link { min-width: unset; }
+      .btn-action { font-size: 1rem; padding: 10px; }
+    }
+
+    .page-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+   
+
+  @keyframes topBarShimmer {
+    0%   { opacity: 0; }
+    40%  { opacity: 1; filter: brightness(2.2); }
+    100% { opacity: 1; filter: brightness(1); }
+  }
+  body::before { animation: topBarShimmer 1.5s ease-out 1 forwards; }
+
+  @keyframes h1Pulse {
+    0%, 100% { text-shadow: 0 4px 10px rgba(2,79,37,0.4); }
+    50%       { text-shadow: 0 4px 22px rgba(2,140,70,0.7); }
+  }
+  h1 { animation: h1Pulse 4s ease-in-out infinite; }
+
+  .menu-grid a:hover {
+    box-shadow: 0 8px 25px rgba(2,140,70,0.35), 0 0 20px rgba(2,140,70,0.4) !important;
+  }
+
+  @keyframes cardEntrance {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  button:active, .btn-action:active, .admin-link:active, .menu-grid a:active {
+    transform: scale(0.96) !important;
+    transition: transform 0.1s !important;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    box-shadow: 0 0 0 3px rgba(2,140,70,0.25) !important;
+    transition: box-shadow 0.2s, border-color 0.2s !important;
+  }
+
+  .ripple-effect {
+    position: absolute; border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    transform: scale(0);
+    animation: rippleAnim 0.5s linear forwards;
+    pointer-events: none; z-index: 10;
+  }
+  @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+  </style>
+
+</head>
+<body>
+
+  <main class="page-main">
+  <div class="container">
+    <h1>نظام العداد الإلكتروني</h1>
+    <p style="text-align:center; color:var(--primary-color); font-size:0.9em; margin-top:-18px; margin-bottom:10px; opacity:0.75;" class="federation-name"></p>
+
+    <div class="match-selector">
+      <h2>المباراة النشطة</h2>
+      <input type="text" id="match-search" placeholder="🔍 ابحث باسم المباراة أو رقمها..." oninput="filterMatches()" autocomplete="off">
+      <div id="no-results">لا توجد نتائج مطابقة</div>
+      <select id="match-select">
+        <option value="">-- اختر مباراة للبدء --</option>
+      </select>
+      <button class="btn-action" onclick="setActiveMatch()">تأكيد الاختيار</button>
+    </div>
+
+    <div class="menu-grid">
+      <a href="index61245675.html">شاشة العرض</a>
+      <a href="index245645645.html">لوحة التحكم</a>
+      <a href="index326486464.html">شاشة العرض (جوال)</a>
+    </div>
+
+    <div class="admin-row">
+      <a href="index44567967.html" class="admin-link">إعداد الفرق</a>
+      <a href="index586786454.html" class="admin-link">إدارة المباريات</a>
+      <button class="admin-link" onclick="openLogoModal()" style="border:none; cursor:pointer; font-family:inherit; font-size:inherit;">شعار البطوله</button>
+      <a href="index_import.html" class="admin-link">استيراد جدول</a>
+    </div>
+
+    <!-- Logo Upload Modal -->
+    <div id="logo-modal" style="display:none; position:fixed; z-index:5000; inset:0; background:rgba(0,0,0,0.82); justify-content:center; align-items:center;">
+      <div style="background:#111d24; border:2px solid #028C46; border-radius:18px; padding:30px 28px; width:340px; max-width:92vw; text-align:center; box-shadow:0 0 40px rgba(2,140,70,0.3);">
+        <h3 style="color:#028C46; margin:0 0 18px; font-size:1.2rem; letter-spacing:1px;">شعار البطوله</h3>
+        <div id="logo-preview-wrap" style="margin-bottom:16px; min-height:80px; display:flex; align-items:center; justify-content:center;">
+          <img id="logo-modal-preview" src="" alt="" style="max-height:100px; max-width:100%; border-radius:8px; display:none; background:rgba(255,255,255,0.05); padding:6px;">
+        </div>
+        <label style="display:block; background:#1a2830; border:2px dashed rgba(2,140,70,0.5); border-radius:10px; padding:14px; cursor:pointer; color:#aaa; font-size:0.9rem; margin-bottom:14px; transition:border-color 0.2s;" onmouseover="this.style.borderColor='#028C46'" onmouseout="this.style.borderColor='rgba(2,140,70,0.5)'">
+          📁 اختر صورة الشعار
+          <input type="file" id="logo-file-input" accept="image/*" style="display:none;" onchange="previewLogo(this)">
+        </label>
+        <div style="display:flex; gap:10px; justify-content:center;">
+          <button onclick="saveLogo()" style="flex:1; padding:10px; background:linear-gradient(135deg,#028C46,#024F25); color:white; border:none; border-radius:10px; font-size:1rem; font-weight:bold; cursor:pointer; font-family:inherit;">حفظ</button>
+          <button onclick="closeLogoModal()" style="flex:1; padding:10px; background:#162C36; color:#028C46; border:1px solid #028C46; border-radius:10px; font-size:1rem; font-weight:bold; cursor:pointer; font-family:inherit;">إلغاء</button>
+        </div>
+        <div id="logo-save-msg" style="margin-top:12px; color:#028C46; font-size:0.9rem; display:none;">✔ تم حفظ الشعار بنجاح</div>
+      </div>
+    </div>
+
+  </div>
+  </main>
+
+ 
+<!-- Copyright (c) 2026 Saud Alhamad. All rights reserved. Licensed to STTF. -->
+
+    <script src="config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+    const firebaseConfig = APP_CONFIG.firebase;
+
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+    const database = firebase.database();
+
+    let allMatches = [];
+    let activeMatchId = null;
+
+    function loadMatches() {
+      database.ref('activeMatch').once('value', activeSnap => {
+        activeMatchId = activeSnap.val();
+
+        database.ref('matches').once('value', snapshot => {
+          const matches = snapshot.val();
+          allMatches = [];
+
+          if (matches) {
+            Object.keys(matches).forEach(matchId => {
+              allMatches.push({ id: matchId, ...matches[matchId] });
+            });
+
+            allMatches.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+          }
+
+          renderOptions(allMatches);
+        });
+      });
+    }
+
+    function renderOptions(list) {
+      const select = document.getElementById('match-select');
+      const noResults = document.getElementById('no-results');
+      const savedValue = select.value;
+
+      while (select.options.length > 1) select.remove(1);
+
+      if (list.length === 0) {
+        noResults.style.display = 'block';
+        select.style.display = 'none';
+      } else {
+        noResults.style.display = 'none';
+        select.style.display = 'block';
+
+        list.forEach(m => {
+          const option = document.createElement('option');
+          option.value = m.id;
+          const num = m.number ? `[${m.number}] ` : '';
+          option.textContent = num + (m.name || `مباراة ${m.id}`);
+          if (m.id === activeMatchId) {
+            option.textContent += ' ⭐';
+            option.selected = true;
+          }
+          select.appendChild(option);
+        });
+
+        if (savedValue && savedValue !== activeMatchId) {
+          const exists = list.find(m => m.id === savedValue);
+          if (exists) select.value = savedValue;
+        }
+      }
+    }
+
+    function filterMatches() {
+      const query = document.getElementById('match-search').value.trim().toLowerCase();
+      if (!query) {
+        renderOptions(allMatches);
+        return;
+      }
+
+      const filtered = allMatches.filter(m => {
+        const nameMatch = (m.name || '').toLowerCase().includes(query);
+        const numMatch = String(m.number || '').includes(query);
+        return nameMatch || numMatch;
+      });
+
+      renderOptions(filtered);
+    }
+
+    const IS_LOCAL = true; 
+    async function setActiveMatch() {
+      const matchId = document.getElementById('match-select').value;
+      if (matchId) {
+        if (IS_LOCAL) {
+          await database.ref('activeMatch').set(matchId);
+        } else {
+          await fetch('/.netlify/functions/s245645645', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'setActiveMatch', id: matchId })
+          });
+        }
+        alert('تم التحديث بنجاح');
+        document.getElementById('match-search').value = '';
+        loadMatches();
+      }
+    }
+
+    window.onload = loadMatches;
+
+    // ── Logo modal ──
+    function openLogoModal() {
+      const modal = document.getElementById('logo-modal');
+      modal.style.display = 'flex';
+      document.getElementById('logo-save-msg').style.display = 'none';
+      database.ref('settings/logoUrl').once('value', snap => {
+        const url = snap.val();
+        const preview = document.getElementById('logo-modal-preview');
+        if (url) { preview.src = url; preview.style.display = 'block'; }
+        else { preview.style.display = 'none'; }
+      });
+    }
+
+    function closeLogoModal() {
+      document.getElementById('logo-modal').style.display = 'none';
+      document.getElementById('logo-file-input').value = '';
+    }
+
+    function previewLogo(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const preview = document.getElementById('logo-modal-preview');
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function saveLogo() {
+      const input = document.getElementById('logo-file-input');
+      const preview = document.getElementById('logo-modal-preview');
+      if (!input.files[0] && !preview.src) { alert('يرجى اختيار صورة أولاً'); return; }
+      const dataUrl = preview.src;
+      if (!dataUrl || dataUrl === window.location.href) { alert('يرجى اختيار صورة أولاً'); return; }
+      await database.ref('settings/logoUrl').set(dataUrl);
+      const msg = document.getElementById('logo-save-msg');
+      msg.style.display = 'block';
+      setTimeout(() => { msg.style.display = 'none'; closeLogoModal(); }, 1200);
+    }
+  </script>
+
+  <script>
+  (function () {
+    function initRipple() {
+      document.querySelectorAll('button, .btn-action, .admin-link, .menu-grid a').forEach(function (el) {
+        if (el.dataset.ripple) return;
+        el.dataset.ripple = '1';
+        if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+        el.style.overflow = 'hidden';
+        el.addEventListener('click', function (e) {
+          var r = document.createElement('span');
+          r.className = 'ripple-effect';
+          var rect = el.getBoundingClientRect();
+          var size = Math.max(rect.width, rect.height);
+          r.style.width = r.style.height = size + 'px';
+          r.style.left = (e.clientX - rect.left - size / 2) + 'px';
+          r.style.top  = (e.clientY - rect.top  - size / 2) + 'px';
+          el.appendChild(r);
+          r.addEventListener('animationend', function () { r.remove(); });
+        });
+      });
+    }
+
+    function animateCards() {
+      document.querySelectorAll('.match-selector, .menu-grid a').forEach(function (el, i) {
+        el.style.opacity = '0';
+        el.style.animation = 'cardEntrance 0.45s ease-out ' + (i * 80) + 'ms forwards';
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      initRipple();
+      animateCards();
+    });
+  })();
+  </script>
+</body>
+</html>

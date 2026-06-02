@@ -112,17 +112,17 @@
         .serve-modal-sub { color: #888; font-size: 0.88em; margin-bottom: 24px; }
         .serve-team-btns { display: flex; gap: 16px; justify-content: center; direction: ltr; }
         .btn-serve-team { flex: 1; padding: 18px 12px; border-radius: 10px; font-size: 1.05em; font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.05); color: white; border: 2px solid rgba(255,204,0,0.25); transition: 0.2s; }
-        .btn-serve-team:hover { background: rgba(30,152,71,0.15); border-color: var(--primary-gold); color: var(--primary-gold); }
-
-        @media (max-width: 1024px) {
-            .btn-plus { width: 90px; height: 90px; font-size: 3.8em; }
-            .score-display { font-size: 3em; }
-            .match-val { font-size: 2em; }
-            .bottom-score-area { gap: clamp(60px, 12vw, 180px); }
-            .ittf-score-table thead th { font-size: 0.74em; padding: 4px 7px; }
-            .ittf-score-table tbody td { font-size: 0.8em; padding: 5px 7px; }
-            .flag-img { width: 40px; height: 40px; }
-        }
+        .btn-serve-team:hover { background: rgba(30,152,71,0.15); border-color: var(--primary-gold); color: var(--primary-@media (max-width: 1024px) {
+    body { overflow-y: auto; height: auto; min-height: 100vh; }
+    .court-container { flex-grow: 0; }
+    .btn-plus { width: 90px; height: 90px; font-size: 3.8em; }
+    .score-display { font-size: 3em; }
+    .match-val { font-size: 2em; }
+    .bottom-score-area { gap: clamp(60px, 12vw, 180px); }
+    .ittf-score-table thead th { font-size: 0.74em; padding: 4px 7px; }
+    .ittf-score-table tbody td { font-size: 0.8em; padding: 5px 7px; }
+    .flag-img { width: 40px; height: 40px; }
+}
 
         @media (max-width: 768px) {
             body { overflow-y: auto; height: auto; min-height: 100vh; }

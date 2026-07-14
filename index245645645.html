@@ -47,7 +47,7 @@
         }
         .header-bar { background: var(--card-bg); color: white; border-bottom: 3px solid var(--primary-gold); display: flex; justify-content: space-between; align-items: center; padding: 5px 20px; height: 44px; }
         .status-display-area { background: #0d1520; padding: 8px 12px; border-bottom: 2px solid rgba(2,140,70,0.4); overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        .score-table-wrap { display: flex; align-items: center; gap: 14px; background: linear-gradient(135deg, #071810 0%, #0a1e12 100%); border-radius: 10px; border: 2px solid rgba(2,140,70,0.55); padding: 8px 12px; box-shadow: 0 0 18px rgba(2,140,70,0.12) inset; }
+        .score-table-wrap { display: flex; align-items: center; gap: 14px; background: linear-gradient(135deg, #071810 0%, #0a1e12 100%); border-radius: 10px; border: 2px solid rgba(2,140,70,0.55); padding: 8px 12px; box-shadow: 0 0 18px rgba(2,140,70,0.12) inset; direction: rtl; }
         .timer-compact { display: flex; flex-direction: column; align-items: center; min-width: 72px; }
         .timer-box { font-size: 1.8em; font-weight: bold; color: var(--primary-gold); text-align: center; line-height: 1.1; }
         .timer-label { font-size: 0.65em; color: var(--primary-gold); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
@@ -55,16 +55,16 @@
         .card-mini { width: 32px; height: 46px; visibility: hidden; object-fit: contain; background: #2a2a2a; border: 1.5px solid #555; border-radius: 4px; padding: 2px; box-shadow: 0 1px 4px rgba(0,0,0,0.6); }
         .ittf-score-table { border-collapse: collapse; flex: 1; font-family: 'Inter', 'Cairo', sans-serif; border: 3px solid #028C46; }
         .ittf-score-table thead th { background: #028C46; color: white; font-weight: bold; font-size: 0.82em; padding: 5px 10px; text-align: center; border: 1px solid rgba(255,255,255,0.2); white-space: nowrap; }
-        .ittf-score-table thead th.th-name { text-align: left; padding-left: 10px; background: #024F25; min-width: 190px; }
+        .ittf-score-table thead th.th-name { text-align: right; padding-right: 10px; background: #024F25; min-width: 190px; }
         .ittf-score-table thead th.th-name a { color: #ffffff; text-decoration: underline; }
         .ittf-score-table thead th.th-ssq { background: #026835; }
         .ittf-score-table thead th.th-game { background: #028C46; }
         .ittf-score-table tbody td { background: #111d24; color: #e0e0e0; font-weight: bold; font-size: 0.88em; padding: 6px 10px; text-align: center; border: 1px solid rgba(2,140,70,0.2); }
-        .ittf-score-table tbody td.td-name { text-align: left; padding-left: 10px; font-size: 1.1em; color: #fff; background: #071810 !important; }
+        .ittf-score-table tbody td.td-name { text-align: right; padding-right: 10px; font-size: 1.1em; color: #fff; background: #071810 !important; }
         #table-name-left, #table-name-right { font-size: 1.25em; font-weight: bold; }
         .ittf-score-table tbody tr:first-child td { border-bottom: 1px solid rgba(2,140,70,0.3); }
         .score-active { background: #028C46 !important; color: #ffffff !important; font-size: 1.05em !important; box-shadow: inset 0 0 8px rgba(255,255,255,0.15); }
-        .flag-img { width: 56px; height: 56px; object-fit: contain; border-radius: 0; border: none; display: inline-block; vertical-align: middle; margin-right: 7px; background: transparent; }
+        .flag-img { width: 56px; height: 56px; object-fit: contain; border-radius: 0; border: none; display: inline-block; vertical-align: middle; margin-left: 7px; background: transparent; }
         .player-country { display: inline-flex; align-items: center; gap: 6px; }
         .country-code { font-size: 0.75em; color: #aaa; font-weight: normal; letter-spacing: 1px; }
         .score-done { background: #0d2215 !important; color: #90c49a !important; }
@@ -72,7 +72,7 @@
         .score-empty { background: #06100a !important; color: #2a4a30 !important; }
         .th-badge { display: inline-block; background: var(--primary-gold); color: #fff; border-radius: 3px; padding: 1px 5px; margin-left: 4px; font-size: 0.85em; }
 
-        .court-container { display: grid; grid-template-columns: 1fr 2.5fr 1fr; gap: 15px; padding: 10px; flex-grow: 1; }
+        .court-container { display: grid; grid-template-columns: 1fr 2.5fr 1fr; gap: 15px; padding: 10px; flex-grow: 1; direction: ltr; }
         .side-control { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px; }
         .btn-plus { width: 110px; height: 110px; border-radius: 50%; background: var(--btn-green); border: 6px solid #444; color: white; font-size: 4.5em; cursor: pointer; display: flex; justify-content: center; align-items: center; }
         .btn-minus { width: 50px; height: 50px; border-radius: 50%; background: var(--btn-red); border: 3px solid #444; color: white; font-size: 2em; cursor: pointer; }
@@ -157,9 +157,10 @@
             .btn-end-match { font-size: 0.82em !important; }
         }
 
-        .ittf-table { background: var(--ittf-green); border: 4px solid white; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
-        .player-slot { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 5px; border: 0.5px solid rgba(255,255,255,0.1); }
-        .player-slot img { width: 120px; height: 120px; object-fit: contain; margin-bottom: 5px; border-radius: 3px; background: transparent; }
+        .ittf-table { background: var(--bg-dark); border: 3px solid #028C46; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; direction: ltr; border-radius: 10px; overflow: hidden; }
+        .player-slot { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 25px 15px; border: none; }
+        .player-slot:first-child { border-right: 2px solid rgba(255,255,255,0.15); }
+        .player-slot img { width: 160px; height: 160px; object-fit: contain; margin-bottom: 12px; border-radius: 3px; background: transparent; }
         
         .score-serve-area { display: flex; flex-direction: column; align-items: center; background: #333; padding: 10px; position: relative; height: 110px; }
         #serve-indicator {
@@ -184,7 +185,7 @@
         #match-val-right.point-flash {
             animation: pointScored 0.65s ease-out forwards;
         }
-        .bottom-score-area { display: flex; justify-content: center; align-items: center; gap: 250px; width: 100%; margin-top: 40px; }
+        .bottom-score-area { display: flex; justify-content: center; align-items: center; gap: 250px; width: 100%; margin-top: 40px; direction: ltr; }
         .match-score-control { display: flex; flex-direction: row; align-items: center; gap: 8px; }
         .score-display { font-size: 4em; font-weight: bold; line-height: 1; }
         .match-val { color: var(--ittf-orange); font-size: 2.5em; font-weight: bold; }
@@ -545,10 +546,8 @@
         </div>
 
         <div class="ittf-table">
-            <div class="player-slot"><img id="logo-l" src=""><span id="name-l-p1" style="font-weight: bold; font-size: 1.7em;"></span></div>
-            <div class="player-slot"><img id="logo-r" src=""><span id="name-r-p1" style="font-weight: bold; font-size: 1.7em;"></span></div>
-            <div class="player-slot"><span id="name-l-p2" style="font-size: 1.5em; color:white;">-</span></div>
-            <div class="player-slot"><span id="name-r-p2" style="font-size: 1.5em; color:white;">-</span></div>
+            <div class="player-slot"><img id="logo-l" src=""><span id="name-l-combined" style="font-weight: bold; font-size: 1.5em;">-</span></div>
+            <div class="player-slot"><img id="logo-r" src=""><span id="name-r-combined" style="font-weight: bold; font-size: 1.5em;">-</span></div>
         </div>
 
         <div class="side-control">
@@ -774,7 +773,7 @@
                         ws = lp >= rp ? 'left' : 'right';
                     }
                     const wt = d.teams?.[ws] || {};
-                    const wn = [wt.p2,wt.p1].filter(Boolean).join(' | ').toUpperCase() || 'WINNER';
+                    const wn = [wt.p1,wt.p2].filter(Boolean).join(' / ').toUpperCase() || 'WINNER';
                     const wSet = ws === 'left' ? sl : sr;
                     const lSet = ws === 'left' ? sr : sl;
                     await dbRef('showCongrats').remove();
@@ -946,14 +945,14 @@
                         };
 
                         if(currentData.teams) {
-                            document.getElementById('name-l-p2').innerText = currentData.teams.left?.p1 || "-";
-                            document.getElementById('name-l-p1').innerText = currentData.teams.left?.p2 || "";
+                            document.getElementById('name-l-combined').innerText = [currentData.teams.left?.p1, currentData.teams.left?.p2].filter(Boolean).join(' / ') || '-';
                             setImg('logo-l', currentData.teams.left?.logo);
-                            document.getElementById('name-r-p2').innerText = currentData.teams.right?.p1 || "-";
-                            document.getElementById('name-r-p1').innerText = currentData.teams.right?.p2 || "";
+                            document.getElementById('name-r-combined').innerText = [currentData.teams.right?.p1, currentData.teams.right?.p2].filter(Boolean).join(' / ') || '-';
                             setImg('logo-r', currentData.teams.right?.logo);
-                            const lName = [currentData.teams.left?.p2, currentData.teams.left?.p1].filter(Boolean).join(' | ').toUpperCase() || '-';
-                            const rName = [currentData.teams.right?.p2, currentData.teams.right?.p1].filter(Boolean).join(' | ').toUpperCase() || '-';
+                            const lId = currentData.teams.left?.p1id ? `[${currentData.teams.left.p1id}] ` : '';
+                            const rId = currentData.teams.right?.p1id ? `[${currentData.teams.right.p1id}] ` : '';
+                            const lName = lId + ([currentData.teams.left?.p1, currentData.teams.left?.p2].filter(Boolean).join(' / ').toUpperCase() || '-');
+                            const rName = rId + ([currentData.teams.right?.p1, currentData.teams.right?.p2].filter(Boolean).join(' / ').toUpperCase() || '-');
                             document.getElementById('table-name-left').innerText  = lName;
                             document.getElementById('table-name-right').innerText = rName;
                             setImg('table-flag-left',  currentData.teams.left?.logo);
@@ -1309,7 +1308,7 @@
             const rSets = parseInt(document.getElementById('match-val-right').innerText) || 0;
             const winnerSide = lSets >= rSets ? 'left' : 'right';
             const winTeam  = currentData.teams?.[winnerSide] || {};
-            const wName = winTeam.name || [winTeam.p2, winTeam.p1].filter(Boolean).join(' | ') || 'الفائز';
+            const wName = winTeam.name || [winTeam.p1, winTeam.p2].filter(Boolean).join(' / ') || 'الفائز';
             const winSets  = winnerSide === 'left' ? lSets : rSets;
             const loseSets = winnerSide === 'left' ? rSets : lSets;
             await callAction('showCongrats', {
@@ -1319,8 +1318,58 @@
             });
         }
 
-        function newMatch() {
+        async function newMatch() {
             document.getElementById('winner-overlay').classList.remove('show');
+
+            // ── إرسال النتائج للباكند وبورتال عمر ──
+            const BACKEND_URL = (window.APP_CONFIG && window.APP_CONFIG.backendUrl) || '';
+            if (BACKEND_URL && activeId && currentData) {
+                try {
+                    // جمع بيانات المباراة
+                    const [sl, sr] = (currentData.setScore || '0 - 0').split(' - ').map(n => parseInt(n) || 0);
+                    const ws = sl > sr ? 'left' : sr > sl ? 'right' : (sl >= sr ? 'left' : 'right');
+                    const wt = currentData.teams?.[ws] || {};
+                    const lt = currentData.teams?.left || {};
+                    const rt = currentData.teams?.right || {};
+
+                    const payload = {
+                        sourceMatchId: activeId,
+                        matchId: activeId,
+                        matchName: currentData.name || '',
+                        matchNumber: currentData.number || '',
+                        playedAt: new Date().toISOString(),
+                        results: {
+                            winner: ws,
+                            winnerName: [wt.p1, wt.p2].filter(Boolean).join(' / ') || wt.name || '',
+                            setScore: currentData.setScore || '0 - 0',
+                            matchScore: currentData.matchScore || '0 - 0',
+                            gameHistory: currentData.gameHistory || [],
+                            teams: {
+                                left: { name: lt.name || '', p1: lt.p1 || '', p2: lt.p2 || '', logo: lt.logo || '' },
+                                right: { name: rt.name || '', p1: rt.p1 || '', p2: rt.p2 || '', logo: rt.logo || '' }
+                            }
+                        }
+                    };
+
+                    console.log('📤 إرسال النتائج للباكند...', payload);
+
+                    const res = await fetch(`${BACKEND_URL}/api/send-results`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const data = await res.json().catch(() => ({}));
+                    if (res.ok) {
+                        console.log('✅ النتائج وصلت للباكند والبورتال', data);
+                    } else {
+                        console.warn('⚠️ الباكند رفض الطلب:', res.status, data);
+                    }
+                } catch (err) {
+                    console.warn('⚠️ ما قدر يرسل للباكند:', err.message);
+                }
+            }
+
             location.href = 'index.html';
         }
         function switchPlayers() {
@@ -1363,8 +1412,8 @@
             const editLogoR = document.getElementById('edit-logo-right');
             editLogoL.src = lTeam.logo || ''; editLogoL.style.display = lTeam.logo ? 'block' : 'none';
             editLogoR.src = rTeam.logo || ''; editLogoR.style.display = rTeam.logo ? 'block' : 'none';
-            document.getElementById('edit-name-left').innerText  = lTeam.name || [lTeam.p2, lTeam.p1].filter(Boolean).join(' | ') || '-';
-            document.getElementById('edit-name-right').innerText = rTeam.name || [rTeam.p2, rTeam.p1].filter(Boolean).join(' | ') || '-';
+            document.getElementById('edit-name-left').innerText  = lTeam.name || [lTeam.p1, lTeam.p2].filter(Boolean).join(' / ') || '-';
+            document.getElementById('edit-name-right').innerText = rTeam.name || [rTeam.p1, rTeam.p2].filter(Boolean).join(' / ') || '-';
 
             let lVal = 0, rVal = 0;
             if (idx === 'current') {

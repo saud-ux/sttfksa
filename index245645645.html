@@ -609,13 +609,13 @@
             <div class="serve-modal-title"> من يبدأ الإرسال؟</div>
             <div class="serve-modal-sub">اختر الفريق الذي يبدأ بالإرسال</div>
             <div class="serve-team-btns">
-                <button class="btn-serve-team" onclick="setFirstServe('left')">
+                <button class="btn-serve-team" onclick="setFirstServe('right')">
                     <img id="serve-logo-right" src="" alt="" style="width:54px;height:54px;object-fit:contain;border-radius:6px;margin-bottom:8px;display:block;margin-left:auto;margin-right:auto;">
                     <div id="serve-name-right" style="font-size:1.1em;font-weight:bold;margin-bottom:5px;">-</div>
                     <div id="serve-p1-right" style="font-size:0.82em;color:#ccc;">-</div>
                     <div id="serve-p2-right" style="font-size:0.78em;color:#aaa;">-</div>
                 </button>
-                <button class="btn-serve-team" onclick="setFirstServe('right')">
+                <button class="btn-serve-team" onclick="setFirstServe('left')">
                     <img id="serve-logo-left" src="" alt="" style="width:54px;height:54px;object-fit:contain;border-radius:6px;margin-bottom:8px;display:block;margin-left:auto;margin-right:auto;">
                     <div id="serve-name-left" style="font-size:1.1em;font-weight:bold;margin-bottom:5px;">-</div>
                     <div id="serve-p1-left" style="font-size:0.82em;color:#ccc;">-</div>
@@ -1167,14 +1167,14 @@
                     if (el.getAttribute('src') !== (src || '')) el.src = src || '';
                     el.style.display = src ? 'block' : 'none';
                 };
-                setSrc('serve-logo-left', lt.logo);
-                document.getElementById('serve-name-left').innerText  = lt.name || 'الفريق الأيسر';
-                document.getElementById('serve-p1-left').innerText    = lt.p1   || '';
-                document.getElementById('serve-p2-left').innerText    = lt.p2   || '';
-                setSrc('serve-logo-right', rt.logo);
-                document.getElementById('serve-name-right').innerText = rt.name || 'الفريق الأيمن';
-                document.getElementById('serve-p1-right').innerText   = rt.p1   || '';
-                document.getElementById('serve-p2-right').innerText   = rt.p2   || '';
+                setSrc('serve-logo-left', rt.logo);
+                document.getElementById('serve-name-left').innerText  = rt.name || 'الفريق الأيمن';
+                document.getElementById('serve-p1-left').innerText    = rt.p1   || '';
+                document.getElementById('serve-p2-left').innerText    = rt.p2   || '';
+                setSrc('serve-logo-right', lt.logo);
+                document.getElementById('serve-name-right').innerText = lt.name || 'الفريق الأيسر';
+                document.getElementById('serve-p1-right').innerText   = lt.p1   || '';
+                document.getElementById('serve-p2-right').innerText   = lt.p2   || '';
                 database.ref(`matches/${activeId}`).update({ serve: 'center', firstServerOfGame: null });
                 document.getElementById('firstServeModal').classList.add('show');
                 return;

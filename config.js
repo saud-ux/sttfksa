@@ -31,9 +31,6 @@ const APP_CONFIG = {
         website:   "https://sttf.sa"
     },
 
-    // ── رابط الباكند (لإرسال النتائج لبورتال عمر) ─────────────
-    backendUrl: "https://sttf-backend.onrender.com",
-
     // ── إعدادات Firebase ──────────────────────────────────────
     firebase: {
         apiKey:            "AIzaSyAQ74IHM5BN9nAoviMcCaMFnipNfNAGCLM",

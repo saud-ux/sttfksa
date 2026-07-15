@@ -303,18 +303,37 @@
                 </div>
                 <div class="input-group">
                     <label>صورة اللاعب (اختياري):</label>
-                    <input type="text" id="right-p1img" placeholder="رابط URL للصورة" oninput="onPlayerImgUrlInput('right')">
+                    <input type="text" id="right-p1img" placeholder="رابط URL للصورة" oninput="onPlayerImgUrlInput('right-p1')">
                 </div>
                 <div class="input-group">
                     <label>أو رفع الصورة من الجهاز:</label>
                     <div style="display:flex; align-items:center; gap:10px;">
                         <label for="right-p1img-file" style="background:linear-gradient(135deg,#028C46,#024F25); color:white; padding:9px 18px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:0.9em; white-space:nowrap; margin:0;">📁 اختر ملف</label>
-                        <input type="file" id="right-p1img-file" accept="image/*" style="display:none;" onchange="onPlayerImgFileUpload('right')">
+                        <input type="file" id="right-p1img-file" accept="image/*" style="display:none;" onchange="onPlayerImgFileUpload('right-p1')">
                         <span id="right-p1img-name" style="color:#888; font-size:0.85em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">لم يتم اختيار ملف</span>
                     </div>
                 </div>
                 <div class="logo-preview-box" id="right-p1img-preview" style="height:100px;">
                     <span style="color:#444;">معاينة صورة اللاعب</span>
+                </div>
+                <div class="input-group" style="margin-top:12px;">
+                    <label>اللاعب الثاني (زوجي):</label>
+                    <input type="text" id="right-p2" placeholder="اسم اللاعب الثاني (اختياري)">
+                </div>
+                <div class="input-group">
+                    <label>صورة اللاعب الثاني (اختياري):</label>
+                    <input type="text" id="right-p2img" placeholder="رابط URL للصورة" oninput="onPlayerImgUrlInput('right-p2')">
+                </div>
+                <div class="input-group">
+                    <label>أو رفع الصورة من الجهاز:</label>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <label for="right-p2img-file" style="background:linear-gradient(135deg,#028C46,#024F25); color:white; padding:9px 18px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:0.9em; white-space:nowrap; margin:0;">📁 اختر ملف</label>
+                        <input type="file" id="right-p2img-file" accept="image/*" style="display:none;" onchange="onPlayerImgFileUpload('right-p2')">
+                        <span id="right-p2img-name" style="color:#888; font-size:0.85em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">لم يتم اختيار ملف</span>
+                    </div>
+                </div>
+                <div class="logo-preview-box" id="right-p2img-preview" style="height:100px;">
+                    <span style="color:#444;">معاينة صورة اللاعب الثاني</span>
                 </div>
             </div>
 
@@ -349,18 +368,37 @@
                 </div>
                 <div class="input-group">
                     <label>صورة اللاعب (اختياري):</label>
-                    <input type="text" id="left-p1img" placeholder="رابط URL للصورة" oninput="onPlayerImgUrlInput('left')">
+                    <input type="text" id="left-p1img" placeholder="رابط URL للصورة" oninput="onPlayerImgUrlInput('left-p1')">
                 </div>
                 <div class="input-group">
                     <label>أو رفع الصورة من الجهاز:</label>
                     <div style="display:flex; align-items:center; gap:10px;">
                         <label for="left-p1img-file" style="background:linear-gradient(135deg,#028C46,#024F25); color:white; padding:9px 18px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:0.9em; white-space:nowrap; margin:0;">📁 اختر ملف</label>
-                        <input type="file" id="left-p1img-file" accept="image/*" style="display:none;" onchange="onPlayerImgFileUpload('left')">
+                        <input type="file" id="left-p1img-file" accept="image/*" style="display:none;" onchange="onPlayerImgFileUpload('left-p1')">
                         <span id="left-p1img-name" style="color:#888; font-size:0.85em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">لم يتم اختيار ملف</span>
                     </div>
                 </div>
                 <div class="logo-preview-box" id="left-p1img-preview" style="height:100px;">
                     <span style="color:#444;">معاينة صورة اللاعب</span>
+                </div>
+                <div class="input-group" style="margin-top:12px;">
+                    <label>اللاعب الثاني (زوجي):</label>
+                    <input type="text" id="left-p2" placeholder="اسم اللاعب الثاني (اختياري)">
+                </div>
+                <div class="input-group">
+                    <label>صورة اللاعب الثاني (اختياري):</label>
+                    <input type="text" id="left-p2img" placeholder="رابط URL للصورة" oninput="onPlayerImgUrlInput('left-p2')">
+                </div>
+                <div class="input-group">
+                    <label>أو رفع الصورة من الجهاز:</label>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <label for="left-p2img-file" style="background:linear-gradient(135deg,#028C46,#024F25); color:white; padding:9px 18px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:0.9em; white-space:nowrap; margin:0;">📁 اختر ملف</label>
+                        <input type="file" id="left-p2img-file" accept="image/*" style="display:none;" onchange="onPlayerImgFileUpload('left-p2')">
+                        <span id="left-p2img-name" style="color:#888; font-size:0.85em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">لم يتم اختيار ملف</span>
+                    </div>
+                </div>
+                <div class="logo-preview-box" id="left-p2img-preview" style="height:100px;">
+                    <span style="color:#444;">معاينة صورة اللاعب الثاني</span>
                 </div>
             </div>
 
@@ -405,43 +443,49 @@
         }
 
         const logoData = { left: null, right: null };
-        const playerImgData = { left: null, right: null };
+        const playerImgData = {};
 
-        function onPlayerImgUrlInput(side) {
-            playerImgData[side] = null;
-            document.getElementById(`${side}-p1img-file`).value = '';
-            document.getElementById(`${side}-p1img-name`).textContent = 'لم يتم اختيار ملف';
-            updatePlayerImgPreview(side);
+        function onPlayerImgUrlInput(prefix) {
+            playerImgData[prefix] = null;
+            const fileInput = document.getElementById(`${prefix}img-file`);
+            const nameSpan = document.getElementById(`${prefix}img-name`);
+            if (fileInput) fileInput.value = '';
+            if (nameSpan) nameSpan.textContent = 'لم يتم اختيار ملف';
+            updatePlayerImgPreview(prefix);
         }
 
-        function onPlayerImgFileUpload(side) {
-            const file = document.getElementById(`${side}-p1img-file`).files[0];
+        function onPlayerImgFileUpload(prefix) {
+            const file = document.getElementById(`${prefix}img-file`).files[0];
             if (!file) return;
-            document.getElementById(`${side}-p1img-name`).textContent = file.name;
-            document.getElementById(`${side}-p1img`).value = '';
+            document.getElementById(`${prefix}img-name`).textContent = file.name;
+            document.getElementById(`${prefix}img`).value = '';
             const reader = new FileReader();
             reader.onload = function(e) {
-                playerImgData[side] = e.target.result;
-                const box = document.getElementById(`${side}-p1img-preview`);
+                playerImgData[prefix] = e.target.result;
+                const box = document.getElementById(`${prefix}img-preview`);
                 box.innerHTML = `<img src="${e.target.result}" onerror="this.parentElement.innerHTML='خطأ بالملف'">`;
             };
             reader.readAsDataURL(file);
         }
 
-        function updatePlayerImgPreview(side) {
-            const url = document.getElementById(`${side}-p1img`).value;
-            const box = document.getElementById(`${side}-p1img-preview`);
+        function updatePlayerImgPreview(prefix) {
+            const urlInput = document.getElementById(`${prefix}img`);
+            const box = document.getElementById(`${prefix}img-preview`);
+            if (!urlInput || !box) return;
+            const url = urlInput.value;
             if (url) {
                 box.innerHTML = `<img src="${url}" onerror="this.parentElement.innerHTML='خطأ بالرابط'">`;
-            } else if (playerImgData[side]) {
-                box.innerHTML = `<img src="${playerImgData[side]}" onerror="this.parentElement.innerHTML='خطأ بالملف'">`;
+            } else if (playerImgData[prefix]) {
+                box.innerHTML = `<img src="${playerImgData[prefix]}" onerror="this.parentElement.innerHTML='خطأ بالملف'">`;
             } else {
-                box.innerHTML = '<span style="color:#444;">معاينة صورة اللاعب</span>';
+                const label = prefix.includes('p2') ? 'معاينة صورة اللاعب الثاني' : 'معاينة صورة اللاعب';
+                box.innerHTML = `<span style="color:#444;">${label}</span>`;
             }
         }
 
-        function getPlayerImgValue(side) {
-            return playerImgData[side] || document.getElementById(`${side}-p1img`).value;
+        function getPlayerImgValue(prefix) {
+            const urlInput = document.getElementById(`${prefix}img`);
+            return playerImgData[prefix] || (urlInput ? urlInput.value : '');
         }
 
         function onUrlInput(side) {
@@ -490,13 +534,17 @@
                 left: {
                     name: document.getElementById('right-team-name').value,
                     p1: document.getElementById('right-p1').value,
-                    p1img: getPlayerImgValue('right'),
+                    p1img: getPlayerImgValue('right-p1'),
+                    p2: document.getElementById('right-p2').value,
+                    p2img: getPlayerImgValue('right-p2'),
                     logo: getLogoValue('right')
                 },
                 right: {
                     name: document.getElementById('left-team-name').value,
                     p1: document.getElementById('left-p1').value,
-                    p1img: getPlayerImgValue('left'),
+                    p1img: getPlayerImgValue('left-p1'),
+                    p2: document.getElementById('left-p2').value,
+                    p2img: getPlayerImgValue('left-p2'),
                     logo: getLogoValue('left')
                 }
             };
@@ -601,23 +649,32 @@
                             if(m.teams) {
                                 document.getElementById('right-team-name').value = m.teams.left?.name || "الفريق الأول";
                                 document.getElementById('right-p1').value = m.teams.left?.p1 || "";
+                                document.getElementById('right-p2').value = m.teams.left?.p2 || "";
                                 const rightLogo = m.teams.left?.logo || "";
                                 const leftLogo = m.teams.right?.logo || "";
                                 document.getElementById('right-logo').value = rightLogo.startsWith('data:') ? '' : rightLogo;
                                 if (rightLogo.startsWith('data:')) { logoData['right'] = rightLogo; document.getElementById('right-file-name').textContent = 'تم تحميل شعار مسبقاً'; }
                                 document.getElementById('left-team-name').value = m.teams.right?.name || "الفريق الثاني";
                                 document.getElementById('left-p1').value = m.teams.right?.p1 || "";
+                                document.getElementById('left-p2').value = m.teams.right?.p2 || "";
                                 const leftLogoVal = m.teams.right?.logo || "";
                                 document.getElementById('left-logo').value = leftLogoVal.startsWith('data:') ? '' : leftLogoVal;
                                 if (leftLogoVal.startsWith('data:')) { logoData['left'] = leftLogoVal; document.getElementById('left-file-name').textContent = 'تم تحميل شعار مسبقاً'; }
                                 updatePreview('right'); updatePreview('left');
                                 const rightP1img = m.teams.left?.p1img || "";
                                 document.getElementById('right-p1img').value = rightP1img.startsWith('data:') ? '' : rightP1img;
-                                if (rightP1img.startsWith('data:')) { playerImgData['right'] = rightP1img; document.getElementById('right-p1img-name').textContent = 'تم تحميل صورة مسبقاً'; }
+                                if (rightP1img.startsWith('data:')) { playerImgData['right-p1'] = rightP1img; document.getElementById('right-p1img-name').textContent = 'تم تحميل صورة مسبقاً'; }
+                                const rightP2img = m.teams.left?.p2img || "";
+                                document.getElementById('right-p2img').value = rightP2img.startsWith('data:') ? '' : rightP2img;
+                                if (rightP2img.startsWith('data:')) { playerImgData['right-p2'] = rightP2img; document.getElementById('right-p2img-name').textContent = 'تم تحميل صورة مسبقاً'; }
                                 const leftP1img = m.teams.right?.p1img || "";
                                 document.getElementById('left-p1img').value = leftP1img.startsWith('data:') ? '' : leftP1img;
-                                if (leftP1img.startsWith('data:')) { playerImgData['left'] = leftP1img; document.getElementById('left-p1img-name').textContent = 'تم تحميل صورة مسبقاً'; }
-                                updatePlayerImgPreview('right'); updatePlayerImgPreview('left');
+                                if (leftP1img.startsWith('data:')) { playerImgData['left-p1'] = leftP1img; document.getElementById('left-p1img-name').textContent = 'تم تحميل صورة مسبقاً'; }
+                                const leftP2img = m.teams.right?.p2img || "";
+                                document.getElementById('left-p2img').value = leftP2img.startsWith('data:') ? '' : leftP2img;
+                                if (leftP2img.startsWith('data:')) { playerImgData['left-p2'] = leftP2img; document.getElementById('left-p2img-name').textContent = 'تم تحميل صورة مسبقاً'; }
+                                updatePlayerImgPreview('right-p1'); updatePlayerImgPreview('right-p2');
+                                updatePlayerImgPreview('left-p1'); updatePlayerImgPreview('left-p2');
                             }
                             tryFillFromSeries(m, activeId);
                         }

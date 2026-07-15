@@ -995,8 +995,8 @@
 
                         prevServe = displayServe;
                         const ind = document.getElementById('serve-indicator');
-                        if (displayServe === 'left') ind.style.left = '20%';
-                        else if (displayServe === 'right') ind.style.left = '70%';
+                        if (displayServe === 'left') ind.style.left = '70%';
+                        else if (displayServe === 'right') ind.style.left = '20%';
                         else ind.style.left = '45%';
                 };
                 database.ref(`matches/${newId}`).on('value', _matchListener);
@@ -1322,8 +1322,9 @@
             document.getElementById('winner-overlay').classList.remove('show');
 
             // ── إرسال النتائج للباكند وبورتال عمر ──
-            const BACKEND_URL = (window.APP_CONFIG && window.APP_CONFIG.backendUrl) || '';
-            if (BACKEND_URL && activeId && currentData) {
+            const portalSourceId = currentData?.portalSourceId || null;
+
+            if (activeId && currentData && portalSourceId) {
                 try {
                     // جمع بيانات المباراة
                     const [sl, sr] = (currentData.setScore || '0 - 0').split(' - ').map(n => parseInt(n) || 0);
@@ -1332,42 +1333,42 @@
                     const lt = currentData.teams?.left || {};
                     const rt = currentData.teams?.right || {};
 
-                    const payload = {
-                        sourceMatchId: activeId,
-                        matchId: activeId,
-                        matchName: currentData.name || '',
-                        matchNumber: currentData.number || '',
-                        playedAt: new Date().toISOString(),
-                        results: {
-                            winner: ws,
-                            winnerName: [wt.p1, wt.p2].filter(Boolean).join(' / ') || wt.name || '',
-                            setScore: currentData.setScore || '0 - 0',
-                            matchScore: currentData.matchScore || '0 - 0',
-                            gameHistory: currentData.gameHistory || [],
-                            teams: {
-                                left: { name: lt.name || '', p1: lt.p1 || '', p2: lt.p2 || '', logo: lt.logo || '' },
-                                right: { name: rt.name || '', p1: rt.p1 || '', p2: rt.p2 || '', logo: rt.logo || '' }
-                            }
-                        }
+                    const results = {
+                        winner: ws,
+                        winnerName: [wt.p1, wt.p2].filter(Boolean).join(' / ') || wt.name || '',
+                        setScore: currentData.setScore || '0 - 0',
+                        matchScore: currentData.matchScore || '0 - 0',
+                        gameHistory: currentData.gameHistory || [],
+                        teams: {
+                            left: { name: lt.name || '', p1: lt.p1 || '', p2: lt.p2 || '', logo: lt.logo || '' },
+                            right: { name: rt.name || '', p1: rt.p1 || '', p2: rt.p2 || '', logo: rt.logo || '' }
+                        },
+                        playedAt: new Date().toISOString()
                     };
 
-                    console.log('📤 إرسال النتائج للباكند...', payload);
+                    // ١) حفظ النتائج في Firebase عشان الباكند يقدر يقراها
+                    await database.ref(`portal_results/${portalSourceId}`).set(results);
+                    console.log('💾 النتائج انحفظت في portal_results/' + portalSourceId);
 
-                    const res = await fetch(`${BACKEND_URL}/api/send-results`, {
+                    // ٢) إرسال للباكند (Netlify Function على نفس الموقع) عشان يوصلها لبورتال عمر
+                    console.log('📤 إرسال النتائج لبورتال عمر...');
+                    const res = await fetch('/api/send-results', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
+                        body: JSON.stringify({ sourceMatchId: portalSourceId })
                     });
 
                     const data = await res.json().catch(() => ({}));
                     if (res.ok) {
-                        console.log('✅ النتائج وصلت للباكند والبورتال', data);
+                        console.log('✅ النتائج وصلت لبورتال عمر', data);
                     } else {
                         console.warn('⚠️ الباكند رفض الطلب:', res.status, data);
                     }
                 } catch (err) {
                     console.warn('⚠️ ما قدر يرسل للباكند:', err.message);
                 }
+            } else if (activeId && !portalSourceId) {
+                console.log('ℹ️ مباراة محلية — ما تنرسل للبورتال');
             }
 
             location.href = 'index.html';

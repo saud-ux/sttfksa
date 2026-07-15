@@ -1,5 +1,5 @@
 /*
- * POST /.netlify/functions/send-results
+ * POST /api/send-results
  * ──────────────────────────────────────
  * السكوربورد يستدعي هذا لما تنتهي المباراة
  * ويرسل النتيجة لبورتال عمر
@@ -52,6 +52,8 @@ export default async (req, context) => {
       results: scores.results,
     };
 
+    console.log("📦 Payload being sent:", JSON.stringify(resultPayload));
+
     // ── ارسل لبورتال عمر ──
     const portalRes = await fetch(PORTAL_RESULTS_URL, {
       method: "POST",
@@ -82,11 +84,12 @@ export default async (req, context) => {
         { status: 200, headers: { "Content-Type": "application/json" } }
       );
     } else {
-      console.error("❌ Portal rejected:", portalRes.status);
+      console.error("❌ Portal rejected:", portalRes.status, JSON.stringify(portalData));
       return new Response(
         JSON.stringify({
           success: false,
           error: "Portal rejected the results",
+          status: portalRes.status,
           details: portalData,
         }),
         { status: portalRes.status, headers: { "Content-Type": "application/json" } }

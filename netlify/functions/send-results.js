@@ -56,8 +56,10 @@ export default async (req, context) => {
     }
 
     // ── حوّل البيانات لتنسيق عمر ──
-    const gameHistory = (scores.results && scores.results.gameHistory) || [];
-    const winner = (scores.results && scores.results.winner) || "left";
+    // يدعم الفورمات القديم (بدون results) والجديد (مع results)
+    const inner = scores.results || scores;
+    const gameHistory = inner.gameHistory || [];
+    const winner = inner.winner || "left";
     const participants = portalMatch.participants || [];
 
     // side 1 = left في السكوربورد، side 2 = right

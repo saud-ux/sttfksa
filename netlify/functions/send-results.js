@@ -29,6 +29,19 @@ export default async (req, context) => {
 
     console.log(`📤 Sending results for match: ${sourceMatchId}`);
 
+    // ── اجلب بيانات المباراة الأصلية من البورتال (فيها playerId) ──
+    const matchRes = await fetch(
+      `${FIREBASE_URL}/portal_matches/${sourceMatchId}.json`
+    );
+    const portalMatch = await matchRes.json();
+
+    if (!portalMatch) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Portal match not found" }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     // ── اجلب النتيجة من Firebase ──
     const scoresRes = await fetch(
       `${FIREBASE_URL}/portal_results/${sourceMatchId}.json`
@@ -37,22 +50,67 @@ export default async (req, context) => {
 
     if (!scores) {
       return new Response(
-        JSON.stringify({
-          success: false,
-          error: "No results found. Play the match first.",
-        }),
+        JSON.stringify({ success: false, error: "No results found. Play the match first." }),
         { status: 404, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    // ── جهّز الـ payload ──
+    // ── حوّل البيانات لتنسيق عمر ──
+    const gameHistory = (scores.results && scores.results.gameHistory) || [];
+    const winner = (scores.results && scores.results.winner) || "left";
+    const participants = portalMatch.participants || [];
+
+    // side 1 = left في السكوربورد، side 2 = right
+    const side1Players = participants.filter(p => p.side === 1);
+    const side2Players = participants.filter(p => p.side === 2);
+
+    // حساب النقاط لكل جهة من gameHistory
+    // gameHistory = [{l: 11, r: 8}, {l: 9, r: 11}, ...]
+    const leftPoints = gameHistory.map(g => g.l || 0);
+    const rightPoints = gameHistory.map(g => g.r || 0);
+
+    // حساب عدد الأشواط المكسوبة
+    let leftSetsWon = 0;
+    let rightSetsWon = 0;
+    gameHistory.forEach(g => {
+      if ((g.l || 0) > (g.r || 0)) leftSetsWon++;
+      else if ((g.r || 0) > (g.l || 0)) rightSetsWon++;
+    });
+
+    const leftIsWinner = winner === "left";
+
+    // بناء مصفوفة النتائج بتنسيق عمر
+    const results = [];
+
+    side1Players.forEach(p => {
+      results.push({
+        playerId: p.playerId,
+        side: 1,
+        positionInSide: p.positionInSide || 1,
+        setsWon: leftSetsWon,
+        pointsFor: leftPoints,
+        isWinner: leftIsWinner,
+      });
+    });
+
+    side2Players.forEach(p => {
+      results.push({
+        playerId: p.playerId,
+        side: 2,
+        positionInSide: p.positionInSide || 1,
+        setsWon: rightSetsWon,
+        pointsFor: rightPoints,
+        isWinner: !leftIsWinner,
+      });
+    });
+
     const resultPayload = {
       matchId: sourceMatchId,
       playedAt: scores.playedAt || new Date().toISOString(),
-      results: scores.results,
+      results: results,
     };
 
-    console.log("📦 Payload being sent:", JSON.stringify(resultPayload));
+    console.log("📦 Payload:", JSON.stringify(resultPayload));
 
     // ── ارسل لبورتال عمر ──
     const portalRes = await fetch(PORTAL_RESULTS_URL, {
@@ -69,7 +127,6 @@ export default async (req, context) => {
     if (portalRes.ok) {
       console.log("✅ Results sent successfully");
 
-      // ── حدّث الحالة في Firebase ──
       await fetch(
         `${FIREBASE_URL}/portal_matches/${sourceMatchId}/status.json`,
         {

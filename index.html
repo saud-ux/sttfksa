@@ -146,73 +146,179 @@
       box-shadow: 0 8px 25px rgba(2, 140, 70, 0.35);
     }
 
-    .menu-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 15px;
-    }
+    .menu-grid, .admin-row { display: none; }
 
-    .menu-grid a {
-      padding: 20px 15px;
-      font-size: 1.1rem;
-      text-decoration: none;
-      border-radius: 15px;
-      color: #1a1a1a;
-      font-weight: 700;
-      background-color: var(--primary-color);
-      transition: var(--transition);
+    .fab-menu-btn {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #028C46, #024F25);
+      border: none;
+      color: white;
+      font-size: 1.8rem;
+      cursor: pointer;
+      z-index: 4000;
+      box-shadow: 0 6px 24px rgba(2, 140, 70, 0.45), 0 2px 8px rgba(0,0,0,0.3);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 15px rgba(2, 140, 70, 0.15);
-      color: #fff;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .fab-menu-btn:hover { transform: translateX(-50%) scale(1.08); box-shadow: 0 8px 30px rgba(2, 140, 70, 0.6); }
+    .fab-menu-btn:active { transform: translateX(-50%) scale(0.95); }
+    .fab-menu-btn.open { transform: translateX(-50%) rotate(45deg); }
+
+    .sheet-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0);
+      z-index: 4500;
+      pointer-events: none;
+      transition: background 0.35s ease;
+    }
+    .sheet-backdrop.visible {
+      background: rgba(0, 0, 0, 0.6);
+      pointer-events: auto;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
     }
 
-    .menu-grid a:hover {
-      background-color: var(--primary-hover);
-      transform: scale(1.03);
-      box-shadow: 0 8px 25px rgba(2, 140, 70, 0.35);
+    .bottom-sheet {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 5000;
+      background: linear-gradient(180deg, #152530 0%, #111d24 100%);
+      border-radius: 24px 24px 0 0;
+      padding: 0 20px 34px;
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
+    }
+    .bottom-sheet.open {
+      transform: translateY(0);
     }
 
-    .menu-grid a.admin {
-      background-color: #162C36;
+    .sheet-handle {
+      width: 42px;
+      height: 5px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 3px;
+      margin: 12px auto 8px;
+    }
+
+    .sheet-header {
+      text-align: center;
+      padding: 8px 0 18px;
+      border-bottom: 1px solid rgba(2, 140, 70, 0.15);
+      margin-bottom: 6px;
+    }
+    .sheet-header h3 {
       color: var(--primary-color);
-      border: 1px solid #028C46;
-    }
-
-    .menu-grid a.admin:hover {
-      background-color: #028C46;
-      color: #ffffff;
-    }
-
-    .admin-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-top: 15px;
-    }
-
-    .admin-link {
-      padding: clamp(12px, 2vw, 20px) clamp(18px, 3vw, 30px);
-      font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-      text-decoration: none;
-      border-radius: 15px;
-      color: var(--primary-color);
+      font-size: 1.15rem;
       font-weight: 700;
-      background-color: #162C36;
-      border: 1px solid #028C46;
+      margin: 0;
+      letter-spacing: 0.5px;
+    }
+
+    .sheet-section-label {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.35);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 14px 8px 6px;
+    }
+
+    .sheet-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 15px 12px;
+      border-radius: 14px;
+      text-decoration: none;
+      color: var(--text-white);
+      font-weight: 600;
+      font-size: 1rem;
+      transition: background 0.2s ease;
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      font-family: inherit;
+      direction: rtl;
+    }
+    .sheet-item:hover, .sheet-item:focus {
+      background: rgba(2, 140, 70, 0.1);
+    }
+    .sheet-item:active {
+      background: rgba(2, 140, 70, 0.18);
+      transform: scale(0.98);
+      transition: transform 0.1s;
+    }
+
+    .sheet-item-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: var(--transition);
-      flex: 1;
-      min-width: 130px;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+    .sheet-item-icon.green { background: rgba(2, 140, 70, 0.15); color: #2ecc71; }
+    .sheet-item-icon.blue  { background: rgba(52, 152, 219, 0.15); color: #3498db; }
+    .sheet-item-icon.gold  { background: rgba(241, 196, 15, 0.15); color: #f1c40f; }
+    .sheet-item-icon.purple { background: rgba(155, 89, 182, 0.15); color: #9b59b6; }
+
+    .sheet-item-text {
+      display: flex;
+      flex-direction: column;
+      text-align: right;
+    }
+    .sheet-item-text span:first-child {
+      font-weight: 700;
+      font-size: 1rem;
+      line-height: 1.3;
+    }
+    .sheet-item-text span:last-child {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.4);
+      font-weight: 400;
+      margin-top: 2px;
     }
 
-    .admin-link:hover {
-      background-color: #028C46;
-      color: #ffffff;
+    .sheet-divider {
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+      margin: 4px 8px;
     }
+
+    .sheet-cancel {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      margin-top: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.03);
+      color: rgba(255,255,255,0.5);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+    .sheet-cancel:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); }
 
     .container {
       position: relative;
@@ -237,6 +343,11 @@
       background: #162C36 !important;
       color: #028C46 !important;
       border: 1px solid #028C46 !important;
+      text-decoration: none;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-weight: 700;
+      display: inline-block;
     }
     a[download]:hover {
       background: #028C46 !important;
@@ -244,21 +355,19 @@
     }
 
     @media (max-width: 768px) {
-      .menu-grid { grid-template-columns: 1fr 1fr; }
       .container { padding: 30px 15px; }
       .match-selector { padding: 22px 15px; }
     }
 
     @media (max-width: 480px) {
-      .menu-grid { grid-template-columns: 1fr; }
       h1 { font-size: 1.5rem; }
       .container { padding: 20px 12px; }
       .match-selector { padding: 18px 12px; }
       .match-selector h2 { font-size: 1.1rem; }
-      .menu-grid a { padding: 15px 10px; font-size: 1rem; }
-      .admin-row { grid-template-columns: 1fr; }
-      .admin-link { min-width: unset; }
       .btn-action { font-size: 1rem; padding: 10px; }
+      .bottom-sheet { padding: 0 16px 28px; }
+      .sheet-item { padding: 13px 10px; gap: 12px; }
+      .sheet-item-icon { width: 40px; height: 40px; font-size: 1.1rem; }
     }
 
     .page-main {
@@ -285,8 +394,16 @@
   }
   h1 { animation: h1Pulse 4s ease-in-out infinite; }
 
-  .menu-grid a:hover {
-    box-shadow: 0 8px 25px rgba(2,140,70,0.35), 0 0 20px rgba(2,140,70,0.4) !important;
+  @keyframes fabPulse {
+    0%, 100% { box-shadow: 0 6px 24px rgba(2,140,70,0.45), 0 2px 8px rgba(0,0,0,0.3); }
+    50%      { box-shadow: 0 6px 30px rgba(2,140,70,0.6), 0 2px 12px rgba(0,0,0,0.4); }
+  }
+  .fab-menu-btn { animation: fabPulse 3s ease-in-out infinite; }
+  .fab-menu-btn.open { animation: none; }
+
+  @keyframes sheetItemIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes cardEntrance {
@@ -294,7 +411,7 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  button:active, .btn-action:active, .admin-link:active, .menu-grid a:active {
+  button:active, .btn-action:active, .sheet-item:active {
     transform: scale(0.96) !important;
     transition: transform 0.1s !important;
   }
@@ -339,17 +456,94 @@
       <button class="btn-action" onclick="setActiveMatch()">تأكيد الاختيار</button>
     </div>
 
-    <div class="menu-grid">
-      <a href="index61245675.html">شاشة العرض</a>
-      <a href="index245645645.html">لوحة التحكم</a>
-      <a href="index326486464.html">شاشة العرض (جوال)</a>
-    </div>
+    <button class="fab-menu-btn" id="fab-btn" onclick="toggleSheet()" aria-label="فتح القائمة">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </button>
 
-    <div class="admin-row">
-      <a href="index44567967.html" class="admin-link">إعداد الفرق</a>
-      <a href="index586786454.html" class="admin-link">إدارة المباريات</a>
-      <button class="admin-link" onclick="openLogoModal()" style="border:none; cursor:pointer; font-family:inherit; font-size:inherit;">شعار البطوله</button>
-      <a href="index_import.html" class="admin-link">استيراد جدول</a>
+    <div class="sheet-backdrop" id="sheet-backdrop" onclick="toggleSheet()"></div>
+
+    <div class="bottom-sheet" id="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <h3>القائمة</h3>
+      </div>
+
+      <div class="sheet-section-label">شاشات العرض</div>
+
+      <a href="index61245675.html" class="sheet-item">
+        <div class="sheet-item-icon green">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div class="sheet-item-text">
+          <span>شاشة العرض</span>
+          <span>عرض النتيجة على الشاشة الرئيسية</span>
+        </div>
+      </a>
+
+      <a href="index245645645.html" class="sheet-item">
+        <div class="sheet-item-icon blue">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </div>
+        <div class="sheet-item-text">
+          <span>لوحة التحكم</span>
+          <span>إدارة النقاط والأشواط</span>
+        </div>
+      </a>
+
+      <a href="index326486464.html" class="sheet-item">
+        <div class="sheet-item-icon green">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+        </div>
+        <div class="sheet-item-text">
+          <span>شاشة العرض (جوال)</span>
+          <span>عرض مخصص للجوال والبث</span>
+        </div>
+      </a>
+
+      <div class="sheet-divider"></div>
+      <div class="sheet-section-label">الإدارة</div>
+
+      <a href="index44567967.html" class="sheet-item">
+        <div class="sheet-item-icon purple">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="sheet-item-text">
+          <span>إعداد الفرق</span>
+          <span>إضافة وتعديل بيانات الفرق</span>
+        </div>
+      </a>
+
+      <a href="index586786454.html" class="sheet-item">
+        <div class="sheet-item-icon blue">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="sheet-item-text">
+          <span>إدارة المباريات</span>
+          <span>إنشاء وتنظيم المباريات</span>
+        </div>
+      </a>
+
+      <button class="sheet-item" onclick="toggleSheet(); openLogoModal();">
+        <div class="sheet-item-icon gold">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="sheet-item-text">
+          <span>شعار البطولة</span>
+          <span>رفع وتغيير شعار البطولة</span>
+        </div>
+      </button>
+
+      <a href="index_import.html" class="sheet-item">
+        <div class="sheet-item-icon gold">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <div class="sheet-item-text">
+          <span>استيراد جدول</span>
+          <span>استيراد جدول المباريات</span>
+        </div>
+      </a>
+
+      <button class="sheet-cancel" onclick="toggleSheet()">إلغاء</button>
     </div>
 
     <!-- Logo Upload Modal -->
@@ -526,7 +720,7 @@
   <script>
   (function () {
     function initRipple() {
-      document.querySelectorAll('button, .btn-action, .admin-link, .menu-grid a').forEach(function (el) {
+      document.querySelectorAll('button, .btn-action, .sheet-item').forEach(function (el) {
         if (el.dataset.ripple) return;
         el.dataset.ripple = '1';
         if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
@@ -546,7 +740,7 @@
     }
 
     function animateCards() {
-      document.querySelectorAll('.match-selector, .menu-grid a').forEach(function (el, i) {
+      document.querySelectorAll('.match-selector').forEach(function (el, i) {
         el.style.opacity = '0';
         el.style.animation = 'cardEntrance 0.45s ease-out ' + (i * 80) + 'ms forwards';
       });
@@ -557,6 +751,35 @@
       animateCards();
     });
   })();
+
+  var sheetOpen = false;
+  function toggleSheet() {
+    sheetOpen = !sheetOpen;
+    var sheet = document.getElementById('bottom-sheet');
+    var backdrop = document.getElementById('sheet-backdrop');
+    var fab = document.getElementById('fab-btn');
+
+    if (sheetOpen) {
+      sheet.classList.add('open');
+      backdrop.classList.add('visible');
+      fab.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      var items = sheet.querySelectorAll('.sheet-item');
+      items.forEach(function (el, i) {
+        el.style.opacity = '0';
+        el.style.animation = 'sheetItemIn 0.3s ease-out ' + (i * 50 + 100) + 'ms forwards';
+      });
+    } else {
+      sheet.classList.remove('open');
+      backdrop.classList.remove('visible');
+      fab.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && sheetOpen) toggleSheet();
+  });
   </script>
 </body>
 </html>
